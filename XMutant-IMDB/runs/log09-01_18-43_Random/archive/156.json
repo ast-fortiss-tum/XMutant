@@ -1,0 +1,11 @@
+{
+    "confidence": "0.634307861328125",
+    "elapsed": "4.1654052734375",
+    "expected_label": "0",
+    "id": "156",
+    "misbehaviour": "True",
+    "predicted_label": "1",
+    "text": "<start> i expected this movie to be absolutely god awful like what dreams may come or the truman show or something well they were selling it off for <unk> 99 in my local <unk> and it had giovanni ribisi on the cover you know you cant help but love him and so my friends and friend dared and make rank maine to buy it and i and one was sure it was going to be trash maybe thats the only reason i could sit through this movie because my standards were never that high",
+    "timestamp": "1725209038.7868974",
+    "token": "1 13 873 14 20 8 30 427 558 373 40 51 1306 203 216 42 4 6550 123 42 142 73 36 71 3488 12 125 18 2 3816 11 61 719 2 5 12 69 15165 16810 23 4 1108 25 124 25 2488 339 21 119 90 5 38 61 369 5 464 11909 5 97 4222 15068 8 818 12 5 13 5 31 16 252 12 16 170 8 30 1157 279 1584 4 64 282 13 100 870 143 14 20 88 61 1553 71 115 15 312"
+}

@@ -1,0 +1,11 @@
+{
+    "confidence": "0.9203041195869446",
+    "elapsed": "30.021331787109375",
+    "expected_label": "0",
+    "id": "152",
+    "misbehaviour": "True",
+    "predicted_label": "1",
+    "text": "<start> i have never ever seen such a spoiled movie before the scene where they photograph and picture some guy the pistol don t even shoot damn and blamed that is <unk> the scene with the boy is even not that good atomic number 102 book not any good and serious sound not anything respectable and effective to say about this movie",
+    "timestamp": "1725265466.7963068",
+    "token": "1 13 28 115 126 110 141 6 3657 20 159 4 136 121 36 8613 5 431 49 232 4 8960 1561 830 60 1258 1543 5 7195 15 9 2 4 136 19 4 430 9 60 24 15 52 8885 612 13547 274 24 101 52 5 622 481 24 233 6440 5 1134 8 135 44 14 20"
+}

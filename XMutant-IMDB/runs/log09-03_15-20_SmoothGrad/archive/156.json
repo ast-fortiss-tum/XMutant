@@ -1,0 +1,11 @@
+{
+    "confidence": "0.9932615160942078",
+    "elapsed": "25.199052333831787",
+    "expected_label": "0",
+    "id": "156",
+    "misbehaviour": "True",
+    "predicted_label": "1",
+    "text": "<start> i expected this movie to be absolutely god awful like what dreams may come or the truman show or something well they were selling it off for <unk> 99 in my local <unk> and it had giovanni ribisi on the cut through you know you cant help but love him and so and then my friends dared me to buy it and i was sure it was survive to be glass maybe thats the only argue i could sit through this movie because my standards were never that high and heights",
+    "timestamp": "1725369651.6542757",
+    "token": "1 13 873 14 20 8 30 427 558 373 40 51 1306 203 216 42 4 6550 123 42 142 73 36 71 3488 12 125 18 2 3816 11 61 719 2 5 12 69 15165 16810 23 4 605 143 25 124 25 2488 339 21 119 90 5 38 5 95 61 369 11909 72 8 818 12 5 13 16 252 12 16 2007 8 30 3062 279 1584 4 64 3924 13 100 870 143 14 20 88 61 1553 71 115 15 312 5 5019"
+}

@@ -1,0 +1,11 @@
+{
+    "confidence": "0.9887658953666687",
+    "elapsed": "60.16229319572449",
+    "expected_label": "1",
+    "id": "65",
+    "misbehaviour": "True",
+    "predicted_label": "0",
+    "text": "<start> i don't normally go out of my way to watch romantic comedy and maybe i will in the future after date return to me the plot was simple and no secret after the packaging you don't have to be einstein to guess what will happen after the first 15 minutes what you can do is slack up and let the cast take you into a world where the chemistry <unk> and the good guys deliver the goods and you can just and barely and scarcely and scantily and scarce and barely and scantily and hardly and just laugh and have a secure time i have it away this movie and have the dvd on justify",
+    "timestamp": "1725209094.6593442",
+    "token": "1 13 92 1760 140 46 7 61 96 8 106 731 212 5 279 13 80 11 4 705 103 1304 994 8 72 4 114 16 606 5 57 1003 103 4 14121 25 92 28 8 30 6964 8 482 51 80 593 103 4 86 1119 234 51 25 70 81 9 9934 56 5 387 4 177 193 25 83 6 182 121 4 1175 2 5 4 52 493 1645 4 6610 5 25 70 43 5 1201 5 10689 5 9577 5 12908 5 1201 5 9577 5 983 5 43 462 5 28 6 8188 58 13 28 12 245 14 20 5 28 4 288 23 4356"
+}

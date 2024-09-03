@@ -1,0 +1,11 @@
+{
+    "confidence": "0.5536520481109619",
+    "elapsed": "47.78366804122925",
+    "expected_label": "0",
+    "id": "100",
+    "misbehaviour": "True",
+    "predicted_label": "1",
+    "text": "<start> there are many mysteries in life for example why did any of the people other than carrot top agree to appear in this movie why did anyone distribute this movie why did anyone pay money to see it i guess none of these questions will ever be answered but one thing i know for sure this movie is one of the worst ever made with a budget this big it would already be bad and risky but the addition of carrot humor makes it even and yet worse the only entertainment one could possibly get from this movie is to burn it smash it or otherwise destroy it in an amusing fashion if you were to order it against every movie ever made it would be right between problem small and humble and lowly and modest and small and modest and meek and small and small fry and <unk> scan",
+    "timestamp": "1725369168.5717402",
+    "token": "1 50 26 111 4163 11 113 18 463 138 122 101 7 4 84 85 74 15044 350 1041 8 977 11 14 20 138 122 259 15443 14 20 138 122 259 990 278 8 67 12 13 482 600 7 134 1204 80 126 30 6464 21 31 155 13 124 18 252 14 20 9 31 7 4 249 126 93 19 6 352 14 194 12 62 460 30 78 5 10837 21 4 1577 7 15044 486 166 12 60 5 246 433 4 64 722 31 100 869 79 39 14 20 9 8 3524 12 6875 12 42 900 2330 12 11 35 1139 1597 48 25 71 8 661 12 429 175 20 126 93 12 62 30 208 200 439 392 5 4489 5 16778 5 6111 5 392 5 6111 5 8068 5 392 5 392 11590 5 2 10228"
+}

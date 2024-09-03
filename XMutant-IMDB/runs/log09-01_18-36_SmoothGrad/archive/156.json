@@ -1,0 +1,11 @@
+{
+    "confidence": "0.8324288129806519",
+    "elapsed": "36.1148624420166",
+    "expected_label": "0",
+    "id": "156",
+    "misbehaviour": "True",
+    "predicted_label": "1",
+    "text": "<start> i expected this movie to be absolutely god awful like what dreams may come or the truman show or something well they were selling it off for <unk> 99 in my local <unk> and it had giovanni ribisi on the screen you know you cant help only and just love him and so and therefore and consequently and therefore and accordingly my friends dared me to steal it and i was for certain it was going to be trash maybe and perhaps and possibly thats the simply reason i could sit through this picture because my standards were never that high and heights and richly and high and richly and high and heights and measure",
+    "timestamp": "1725208569.642374",
+    "token": "1 13 873 14 20 8 30 427 558 373 40 51 1306 203 216 42 4 6550 123 42 142 73 36 71 3488 12 125 18 2 3816 11 61 719 2 5 12 69 15165 16810 23 4 268 25 124 25 2488 339 64 5 43 119 90 5 38 5 1617 5 7124 5 1617 5 14202 61 369 11909 72 8 2114 12 5 13 16 18 813 12 16 170 8 30 1157 279 5 382 5 869 1584 4 331 282 13 100 870 143 14 431 88 61 1553 71 115 15 312 5 5019 5 8632 5 312 5 8632 5 312 5 5019 5 4160"
+}

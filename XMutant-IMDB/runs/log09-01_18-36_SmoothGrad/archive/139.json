@@ -1,0 +1,11 @@
+{
+    "confidence": "0.7162840962409973",
+    "elapsed": "60.697208881378174",
+    "expected_label": "0",
+    "id": "139",
+    "misbehaviour": "True",
+    "predicted_label": "1",
+    "text": "<start> it's hard to believe that with a cast and tramp as solid and stiff and loaded as this one has that this movie can be such a dud it's such an fantastically horrible and ugly and horrible and surly and horrifying film how was it ever and ever and invariably and perpetually and eternally and forever and always and constantly and constantly and forever and perpetually and ever and of all time made how did so many good and safe actors wind up in such a terrible film don't waste your life don't take in even and eve and tied and spike star consequence of this return",
+    "timestamp": "1725208569.6328301",
+    "token": "1 45 254 8 264 15 19 6 177 5 8371 17 1156 5 3463 5 4910 17 14 31 47 15 14 20 70 30 141 6 5030 45 141 35 9708 527 5 1558 5 527 5 12994 5 4442 22 89 16 12 126 5 126 5 10727 5 11844 5 16240 5 1437 5 210 5 1343 5 1343 5 1437 5 11844 5 126 5 7 32 58 93 89 122 38 111 52 5 2277 156 1933 56 11 141 6 394 22 92 437 129 113 92 193 11 60 5 3835 5 3146 5 3483 323 7219 7 14 994"
+}

@@ -1,0 +1,11 @@
+{
+    "confidence": "0.6469581127166748",
+    "elapsed": "12.91802430152893",
+    "expected_label": "0",
+    "id": "149",
+    "misbehaviour": "True",
+    "predicted_label": "1",
+    "text": "<start> my friends and i rented this movie <unk> it for another one about <unk> <unk> steve <unk> as an action hero is hilarious the movie is so unbelievably predictable and over the top that it ended up being a laugh fest even though i gave it a 1 10 this movie should be find especially and particularly and specially and particularly if u manage to captivate information technology on tv anywhere",
+    "timestamp": "1725208569.638461",
+    "token": "1 61 369 5 13 1610 14 20 2 12 18 160 31 44 2 2 1230 2 17 35 206 632 9 642 4 20 9 38 3813 727 5 120 4 350 15 12 1054 56 112 6 462 3340 60 151 13 520 12 6 300 158 14 20 144 30 169 262 5 572 5 4886 5 572 48 1206 1921 8 16513 1618 2131 23 248 1764"
+}

@@ -1,0 +1,4 @@
+id,generation,expected_label,predicted_label,misbehaviour,confidence,text
+14,1,0,0,False,0.96849125623703,<start> one of the worst films of it's genre br br the only bright spots were lee showing some of the sparkle she would later bring to the time tunnel and batman br br a young patty duke also <unk> the more established actors br br
+14,2,0,0,False,0.9943022131919861,<start> one of the worst films of it's genre br br the only bright spots were lee showing some of the glitter she would later bring to the time tunnel and batman br br a young patty duke also <unk> the more established actors br br
+14,3,0,1,True,0.8417350649833679,<start> one of the worst films of it's genre br br the only bright spots were lee showing some of the glitter she would later and subsequently bring to the time tunnel and batman br br a young patty duke also <unk> the more established actors br br

@@ -1,0 +1,11 @@
+{
+    "confidence": "0.9630181193351746",
+    "elapsed": "36.14502954483032",
+    "expected_label": "0",
+    "id": "103",
+    "misbehaviour": "True",
+    "predicted_label": "1",
+    "text": "<start> after a string of successful 'a man and his monkey films' which included the seminal every which way but loose every which way you can and peter's friends the genre fell on hard times in an exploit to <unk> this once illustrious area director frank and dog marshal brought michael <unk> acclaimed novel to the big screen br br think in the meets minus the box office <unk> of bruce this is one mans doomed love affair for his talking monkey not helped by bad and sorry accents tim curry struggles with a romanian a <unk> of a screenplay thirsty and hungry and hungry and thirsty and thirsty and hungry and thirsty and thirsty and hungry and thirsty and hungry and thirsty <unk> <unk> and bruce campbell imitation sh t",
+    "timestamp": "1725208569.6119874",
+    "token": "1 103 6 3592 7 1112 8143 132 5 27 3606 14592 63 1926 4 11968 175 63 96 21 1888 175 63 96 25 70 5 15416 369 4 512 1583 23 254 211 11 35 6471 8 2 14 280 14812 1609 167 1265 5 912 11400 839 488 2 5352 667 8 4 194 268 10 10 104 11 4 892 5305 4 953 1052 2 7 1478 14 9 31 9151 4162 119 1586 18 27 662 3606 24 1678 34 78 5 806 2458 1756 15789 3047 19 6 8673 6 2 7 6 881 13065 5 5396 5 5396 5 13065 5 13065 5 5396 5 13065 5 13065 5 5396 5 13065 5 5396 5 13065 2 2 5 1478 4551 4859 4294 830"
+}

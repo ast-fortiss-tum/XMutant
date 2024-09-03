@@ -1,0 +1,11 @@
+{
+    "confidence": "0.9999663829803467",
+    "elapsed": "27.36869502067566",
+    "expected_label": "0",
+    "id": "118",
+    "misbehaviour": "True",
+    "predicted_label": "1",
+    "text": "<start> the best part in this movie is the first one located in <unk> i suppose shows a good talent for photography and the movie start is delightfully surprising and surprise and storm the rest of the story is quite boring <unk> insists on stereotypical situations and characters trying to melt <unk> and video music technique surrealistic and a very annoying and completely off topic soundtrack leading the whole thing towards an end which gives you the sensation of an <unk> long story cut short short frankly this is a real overrated movie and price a genuine overrated conductor",
+    "timestamp": "1725369168.5962005",
+    "token": "1 4 118 173 11 14 20 9 4 86 31 6169 11 2 13 1408 287 6 52 676 18 1381 5 4 20 380 9 6948 1767 5 866 5 3162 4 360 7 4 65 9 179 357 2 5692 23 2749 1186 5 105 269 8 9232 2 5 374 228 3120 12985 5 6 55 616 5 340 125 2989 816 971 4 226 155 949 35 130 63 408 25 4 8776 7 35 2 196 65 605 346 346 2035 14 9 6 147 3879 20 5 1866 6 2038 3879 7756"
+}
