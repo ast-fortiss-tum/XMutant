@@ -3,7 +3,7 @@ from os.path import join
 import json
 
 # GA Setup
-POPSIZE = 1000
+POPSIZE = 200
 NGEN = 100
 SEED = 44
 #
@@ -21,7 +21,7 @@ XAI_METHOD = "Lime"
 MAX_ATTEMPT = 5
 REPORT_NAME = 'stats.csv'
 MUTATION_RECORD = True
-LENGTH_EXPLANATION = 20
+LENGTH_EXPLANATION = 32
 #
 # FEATURES = ["PosCount", "NegCount"] #PosCount NegCount VerbCount
 # NUM_CELLS = 25
