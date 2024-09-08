@@ -9,7 +9,7 @@ import string
 import os
 import csv
 from config import DEFAULT_WORD_ID, INDEX_FROM, NUM_DISTINCT_WORDS, MAX_SEQUENCE_LENGTH
-
+import difflib
 
 WORD_TO_ID = imdb.get_word_index(path="imdb_word_index.json")
 WORD_TO_ID = {k: (v + INDEX_FROM) for k, v in WORD_TO_ID.items()}
@@ -108,3 +108,15 @@ def set_all_seeds(digit):
     np.random.seed(digit)
     tf.keras.utils.set_random_seed(digit)
 
+def find_word_location(sentence, word):
+    # Split the sentence into words
+    words = sentence.split()
+
+    # Use difflib to find the closest match in the sentence
+    closest_matches = difflib.get_close_matches(word, words, n=1, cutoff=0.8)
+
+    # If a close match is found, return its position
+    if closest_matches:
+        return words.index(closest_matches[0])
+    else:
+        return -1

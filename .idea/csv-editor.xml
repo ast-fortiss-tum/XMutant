@@ -31,6 +31,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/XMutant-IMDB/runs_server/runs/summary.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/XMutant-LK-ADS/results/csvs/cumulative_failure.csv">
           <value>
             <Attribute>
@@ -39,6 +46,27 @@
           </value>
         </entry>
         <entry key="/XMutant-MNIST/result/csv_folder/cumulative_misclassified_all.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/XMutant-MNIST/runs/log06-12_18-47_0_C_C_sm/individual_logs/0.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/XMutant-MNIST/runs/log06-12_18-47_0_C_C_sm/stats.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/XMutant-MNIST/runs/summary.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

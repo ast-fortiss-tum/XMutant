@@ -4,7 +4,7 @@ import numpy as np
 import random
 import csv
 
-from config import POPSIZE, NGEN, XAI_METHOD
+from config import POPSIZE, NGEN, XAI_METHOD, SEED
 from population import Population
 # from timer import Timer
 import time
@@ -14,6 +14,7 @@ from utils import set_all_seeds
 # import os
 # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
+set_all_seeds(SEED)
 
 def main(popsize=POPSIZE, xai_method=XAI_METHOD):
 
@@ -54,13 +55,13 @@ def main(popsize=POPSIZE, xai_method=XAI_METHOD):
 
     print(f"MUTATION FINISHED")
     # record data
-    pop.create_report(folder.DST, gen)
+    pop.create_report(folder.DST, gen, SEED)
     print("REPORT GENERATED")
 
 
 
 if __name__ == "__main__":
-    main(popsize=200)
+    main(popsize=5)
     
     # random test
     # for digit in range(10): # range(10):

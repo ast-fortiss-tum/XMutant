@@ -271,7 +271,7 @@ def lime_explainer(prediction_function, text, length_explanation=LENGTH_EXPLANAT
     # Display the explanation
     # exp.show_in_notebook(text=True)
 
-def lime_batch_explainer(prediction_function, indices_list, label_list, length_explanation=LENGTH_EXPLANATION):
+def lime_batch_explainer(prediction_function, indices_list, length_explanation=LENGTH_EXPLANATION):
     """
     Lime text explainer
     Input:
