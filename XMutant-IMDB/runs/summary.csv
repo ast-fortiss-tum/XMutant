@@ -5,5 +5,5 @@ population size,total iteration number,attention method,misbehaviour number,misb
 174,100,IntegratedGradients,121,69.54%
 174,100,IntegratedGradients,122,70.11%
 174,100,Lime,106,60.92%
-174,100,SmoothGrad,115,66.09%
-174,100,SmoothGrad,100,57.47%
+# only apply mutation2 to negative attribution
+174,100,IntegratedGradients,128,73.56%

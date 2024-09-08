@@ -1,21 +1,17 @@
 # Make sure that any of this properties can be overridden using env.properties
-from lib2to3.pgen2.token import NAME
-from multiprocessing.pool import RUN
-import os
 from os.path import join
 import json
-
-from spacy.attrs import LENGTH
 
 # GA Setup
 POPSIZE = 1000
 NGEN = 100
+SEED = 44
 #
 # RUNTIME = 3600
 #
 MODEL = "models/imdb_lstm_model.h5"
 
-XAI_METHOD = "SmoothGrad"
+XAI_METHOD = "Lime"
 # "Random"|"SmoothGrad"|"VanillaSaliency"|"Lime"|"IntegratedGradients"
 
 # Control point selection methods

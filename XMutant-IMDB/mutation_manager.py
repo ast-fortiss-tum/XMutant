@@ -1,21 +1,19 @@
-from multiprocessing import synchronize
-from random import randint, uniform
 import random
 import logging as log
 import sys
 from xai_imdb import top_k_attributions
 
-log.basicConfig(stream=sys.stdout, level=log.DEBUG)
+# log.basicConfig(stream=sys.stdout, level=log.DEBUG)
 import numpy as np
 # from features import neg_words, pos_words
 from config import NUM_DISTINCT_WORDS, MAX_ATTEMPT
-from utils import indices2words, words2indices, ID_TO_WORD, WORD_TO_ID
+from utils import indices2words, words2indices, ID_TO_WORD, WORD_TO_ID, find_word_location
 # from properties import INPUT_MAXLEN
 from nltk.corpus import wordnet
 import nltk
 
 
-def mutate(tokens, attributions):
+def mutate(tokens, attributions, xai_method):
     """
     Mutate a list of word indices based on their weights
 
@@ -28,55 +26,35 @@ def mutate(tokens, attributions):
     assert len(tokens) == len(attributions), "tokens and weights must have the same length"
     assert tokens[0] != 0, "tokens must be unpadded"
 
+    # obtain the top k words based on attributions
     word_indices, sorted_attributions, locations = top_k_attributions(tokens, attributions)
 
-    counter = 0
-    while counter < MAX_ATTEMPT: # make this configurable
-        mutation_method = random.choice([1,2])
-
-        if mutation_method == 1:
-            # log.info(f"Before Mutation: {word_indices}  {sorted_attributions} {locations}")
-            status, new_token, location = apply_mutoperator1(word_indices, sorted_attributions, locations)
-
-        elif mutation_method == 2:
-            pos_token = word_indices[sorted_attributions>=0]
-            neg_token = word_indices[sorted_attributions<0]
-            pos_attributions = sorted_attributions[sorted_attributions>=0]
-            neg_attributions = sorted_attributions[sorted_attributions<0]
-            pos_locations = locations[sorted_attributions>=0]
-            neg_locations = locations[sorted_attributions<0]
-
-            # prioritize negative attributions for mutation 2
-            # log.info(f"Before Mutation: {neg_token}  {neg_attributions} {neg_locations}")
-            status, new_token, location = apply_mutoperator2(neg_token, neg_attributions, neg_locations)
-            if not status:
-                # log.info(f"Before Mutation: {pos_token}  {pos_attributions} {pos_locations}")
-                status, new_token, location = apply_mutoperator1(word_indices, sorted_attributions, locations)
-                # status, new_token, location = apply_mutoperator2(pos_token, pos_attributions, pos_locations)
-        else:
-            raise Exception("Invalid mutation method")
-
+    # mutation_method = random.choice([1,2])
+    mutation_methods = [mut1, mut2]
+    random.shuffle(mutation_methods)
+    for med in mutation_methods:
+        status, new_token, location = med(word_indices, sorted_attributions, locations, tokens, xai_method)
         if status:
-            # insert new tokens at the specified location
-            # tokens[location] = new_token[0]
-            # if len(new_token) > 1:
-            #     tokens.insert(location + 1, new_token[1:])
-            log.info(f"Before Mutation: {indices2words(tokens)}")
-            if len(tokens) == location + 1:
-                tokens = np.concatenate((tokens[:location], new_token))
-            elif location == 0:
-                tokens = np.concatenate((new_token, tokens[1:]))
-            else:
-                tokens =np.concatenate((tokens[:location], new_token, tokens[location+1:]))
+            break
 
-            log.info(f"After Mutation: {indices2words(tokens)}")
-            return status, tokens
+    if status:
+        # insert new tokens at the specified location
+        # tokens[location] = new_token[0]
+        # if len(new_token) > 1:
+        #     tokens.insert(location + 1, new_token[1:])
+        log.info(f"Before Mutation: {indices2words(tokens)}")
+        if len(tokens) == location + 1:
+            tokens = np.concatenate((tokens[:location], new_token))
+        elif location == 0:
+            tokens = np.concatenate((new_token, tokens[1:]))
         else:
-            counter += 1
+            tokens =np.concatenate((tokens[:location], new_token, tokens[location+1:]))
+        log.info(f"After Mutation: {indices2words(tokens)}")
+        return status, tokens
 
     return status, tokens
 
-def mutate_lime(tokens, explanations):
+def mutate_lime(tokens, explanations, label):
     """
     Mutate a list of word indices based on their weights
 
@@ -102,7 +80,7 @@ def mutate_lime(tokens, explanations):
     for i, content  in enumerate(explanations):
         # Find the indices where the token occurs
         index = int(content[0])
-        if index == 0 or index == 6887:
+        if index == 0 or index == 6887 or index == 380: # pad start
             continue
         location = np.where(tokens == index)[0]
 
@@ -110,56 +88,47 @@ def mutate_lime(tokens, explanations):
         if location.size > 0:
             locations.append(location[-1])
         else:
-            # TODO: handle this case
-            print(f"Token {index} not found in tokens: {tokens}")
-            continue
+            location = find_word_location(indices2words(tokens), ID_TO_WORD[index]) # log.info(f"Token {index} not found in tokens: {tokens}")
+
+            if location == -1 or location == 0:
+                print(f"Token {index}-{ID_TO_WORD[index]} not found in tokens: {tokens}-{indices2words(tokens)}")
+                continue
+            else:
+                locations.append(location)
         word_indices.append(index)
-        sorted_attributions.append(content[1])
+        if label == 1:
+            sorted_attributions.append(content[1])
+        elif label == 0:
+            sorted_attributions.append(-content[1])
+        else:
+            raise Exception(f"Invalid label {label}")
+
     word_indices = np.array(word_indices).astype(int)
     sorted_attributions = np.array(sorted_attributions)
     locations = np.array(locations).astype(int)
-    counter = 0
-    while counter < MAX_ATTEMPT: # make this configurable
-        mutation_method = random.choice([1,2])
 
-        if mutation_method == 1:
-            # log.info(f"Before Mutation: {word_indices}  {sorted_attributions} {locations}")
-            status, new_token, location = apply_mutoperator1(word_indices, sorted_attributions, locations)
-
-        elif mutation_method == 2:
-            pos_token = word_indices[sorted_attributions>=0]
-            neg_token = word_indices[sorted_attributions<0]
-            pos_attributions = sorted_attributions[sorted_attributions>=0]
-            neg_attributions = sorted_attributions[sorted_attributions<0]
-            pos_locations = locations[sorted_attributions>=0]
-            neg_locations = locations[sorted_attributions<0]
-
-            # prioritize negative attributions for mutation 2
-            # log.info(f"Before Mutation: {neg_token}  {neg_attributions} {neg_locations}")
-            status, new_token, location = apply_mutoperator2(neg_token, neg_attributions, neg_locations)
-            if not status:
-                # log.info(f"Before Mutation: {pos_token}  {pos_attributions} {pos_locations}")
-                status, new_token, location = apply_mutoperator2(pos_token, pos_attributions, pos_locations)
-        else:
-            raise Exception("Invalid mutation method")
-
+    mutation_methods = [mut1, mut2]
+    random.shuffle(mutation_methods)
+    for med in mutation_methods:
+        status, new_token, location = med(word_indices, sorted_attributions, locations, tokens, xai_method="Lime")
         if status:
-            # insert new tokens at the specified location
-            # tokens[location] = new_token[0]
-            # if len(new_token) > 1:
-            #     tokens.insert(location + 1, new_token[1:])
-            log.info(f"Before Mutation: {indices2words(tokens)}")
-            if len(tokens) == location + 1:
-                tokens = np.concatenate((tokens[:location], new_token))
-            elif location == 0:
-                tokens = np.concatenate((new_token, tokens[1:]))
-            else:
-                tokens =np.concatenate((tokens[:location], new_token, tokens[location+1:]))
+            break
 
-            log.info(f"After Mutation: {indices2words(tokens)}")
-            return status, tokens
+    if status:
+        # insert new tokens at the specified location
+        # tokens[location] = new_token[0]
+        # if len(new_token) > 1:
+        #     tokens.insert(location + 1, new_token[1:])
+        log.info(f"Before Mutation: {indices2words(tokens)}")
+        if len(tokens) == location + 1:
+            tokens = np.concatenate((tokens[:location], new_token))
+        elif location == 0:
+            tokens = np.concatenate((new_token, tokens[1:]))
         else:
-            counter += 1
+            tokens =np.concatenate((tokens[:location], new_token, tokens[location+1:]))
+
+        log.info(f"After Mutation: {indices2words(tokens)}")
+        return status, tokens
 
     return status, tokens
 
@@ -230,8 +199,6 @@ def apply_mutoperator2(tokens, attributions, locations):
     words = [ID_TO_WORD[id] for id in tokens]
     adjs, adjs_index = find_adj_adv(words)
 
-    syn = None
-
     # check if we have any adj in the mutation candidates
     while len(adjs_index) > 0:
         selected_weights = weights[adjs_index]
@@ -252,6 +219,35 @@ def apply_mutoperator2(tokens, attributions, locations):
         # selected_weights = np.delete(selected_weights, np.where(selected_weights == weights[selected_index])[0][0])
 
     return False, None, None
+
+
+def mut1(word_indices, sorted_attributions, locations, tokens=None, xai_method=None):
+    status, new_token, location = apply_mutoperator1(word_indices, sorted_attributions, locations)
+    return status, new_token, location
+
+def mut2(word_indices, sorted_attributions, locations, tokens, xai_method):
+    # remove if the location the next to 'and'
+    to_remove = []
+    # Iterate through the select list in reverse to safely remove elements
+    for i, loc in enumerate(locations):  # use select[:] to avoid modifying the list while iterating
+        if (loc > 0 and tokens[loc - 1] == 5) or (loc < len(tokens) - 1 and tokens[loc + 1] == 5):
+            to_remove.append(i)
+    if len(to_remove) > 0:
+        word_indices = np.delete(word_indices, to_remove)
+        sorted_attributions = np.delete(sorted_attributions, to_remove)
+        locations = np.delete(locations, to_remove)
+
+    if xai_method == "SmoothGrad" or xai_method == "Random":
+        status, new_token, location = apply_mutoperator2(word_indices, sorted_attributions, locations)
+    elif xai_method == "IntegratedGradients" or xai_method == "Lime":
+        neg_token = word_indices[sorted_attributions < 0]
+        neg_attributions = sorted_attributions[sorted_attributions < 0]
+        neg_locations = locations[sorted_attributions < 0]
+        # prioritize negative attributions for mutation 2
+        status, new_token, location = apply_mutoperator2(neg_token, neg_attributions, neg_locations)
+    else:
+        raise Exception(f"Invalid xai method {xai_method}")
+    return status, new_token, location
 
 def get_synonym(word):
     word = word.lower()
@@ -292,6 +288,11 @@ def find_adj_adv(words_list):
             adjs_advs.append(word_tags[i][0])
             ad_id.append(i)
     return adjs_advs, ad_id
+
+def remove_if_next_to_and(lst, locations):
+
+    return to_remove
+
 
 if __name__ == "__main__":
     # indices = np.array([291, 7, 4, 20, 118, 17, 31, 4, 7,

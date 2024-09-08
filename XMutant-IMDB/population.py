@@ -1,10 +1,8 @@
-import sys
 
-import h5py
 import numpy as np
 from os.path import join, exists
 import csv
-import gzip
+
 
 from nltk.app.wordnet_app import explanation
 from tensorflow.keras.datasets import imdb
@@ -82,7 +80,8 @@ class Population:
         if self.xai_method == "Lime":
             explanation = lime_batch_explainer(predictor.predict_texts_xai, batch_individual)
         elif self.xai_method == "Random":
-            explanation = np.ones(shape=(len(batch_individual), MAX_SEQUENCE_LENGTH)) #[1] * len(batch_individual)
+            # assgin random attention map for random method
+            explanation = np.random.rand(len(batch_individual), MAX_SEQUENCE_LENGTH) #[1] * len(batch_individual)
         else:
             explanation = xai_embedding(predictor.model,
                                         batch_individual,
@@ -119,12 +118,12 @@ class Population:
 
         for ind in batch_individual:
             if self.xai_method == "Lime":
-                status, tokens = mutate_lime(ind.pure_indices, ind.attention)
+                status, tokens = mutate_lime(ind.pure_indices, ind.attention, ind.expected_label)
             else:
                 unpad_indices, pad_length = utils.remove_padding(ind.indices)
                 unpad_explanation = ind.attention[pad_length:]
 
-                status, tokens = mutate(unpad_indices, unpad_explanation)
+                status, tokens = mutate(unpad_indices, unpad_explanation, self.xai_method)
             if not status:
                 ind.fail = True
                 continue
@@ -132,7 +131,7 @@ class Population:
             ind.reset()
             # TODO mark
 
-    def create_report(self, path, gen_number):
+    def create_report(self, path, gen_number, seed):
         dst = join(path, REPORT_NAME)
         with open(dst, mode='w') as report_file:
             report_writer = csv.writer(report_file,
@@ -169,12 +168,12 @@ class Population:
         # summary table
         table_name = './runs/summary.csv'
 
-
         data = [self.size,
                 gen_number,
                 self.xai_method,
                 self.misclassified_number,
-                "{:.2f}%".format(self.misclassified_number/self.size*100)]
+                "{:.2f}%".format(self.misclassified_number/self.size*100),
+                seed]
 
         # create csv if it's not existed
         if not exists(table_name):
@@ -184,7 +183,8 @@ class Population:
                            'total iteration number',
                            'attention method',
                            'misbehaviour number',
-                           'misbehaviour Percentage']
+                           'misbehaviour Percentage',
+                           'seed']
                 writer.writerow(headers)
                 writer.writerow(data)
         else:
