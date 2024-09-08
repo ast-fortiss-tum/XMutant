@@ -1,3 +1,0 @@
-id,generation,expected_label,predicted_label,misbehaviour,confidence,text
-135,1,0,0,False,0.9856703281402588,<start> a trite fish out of water story about two friends from the <unk> who move to the big city to seek their fortune they become playboy <unk> and nothing particularly surprising happens after that the final 15 minutes are especially cheesy but at least the <unk> looked good
-135,2,0,1,True,0.6637671589851379,<start> a stock fish out of water story about two friends from the <unk> who move to the big city to seek their fortune they become playboy <unk> and nothing particularly surprising happens after that the final 15 minutes are especially cheesy but at least the <unk> looked good

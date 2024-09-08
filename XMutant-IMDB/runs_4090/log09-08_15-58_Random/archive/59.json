@@ -1,0 +1,11 @@
+{
+    "confidence": "0.6005772352218628",
+    "elapsed": "5.017662286758423",
+    "expected_label": "0",
+    "id": "59",
+    "misbehaviour": "True",
+    "predicted_label": "1",
+    "text": "<start> if you watched the series and love the conference as i do so and so prepare to be thwarted and disappoint i went to the cinema with a group of die hard and heavy league fans and we were all in agreement that this film wasn't as funny or dark and grim as the three series before in my personal opinion it was a money <unk> the writing was contrived and the plot confused no not and non confusing just and upright confused with what it was trying to do it was self indulgence of the worst kind from writer who are far more talented than my pitiful criticisms i hope the league at least and to the grim degree can be honest enough with themselves and acknowledge this film as being substandard to the superb three series 1 testament not be buying it despite owning most of the league <unk>",
+    "timestamp": "1725803883.894027",
+    "token": "1 48 25 296 4 201 5 119 4 12450 17 13 81 38 5 38 5403 8 30 14094 5 4363 13 435 8 4 438 19 6 604 7 783 254 5 1185 2756 451 5 75 71 32 11 12862 15 14 22 286 17 163 42 465 5 2671 17 4 289 201 159 11 61 965 652 12 16 6 278 2 4 487 16 2264 5 4 114 1471 57 24 5 701 1499 43 5 15715 1471 19 51 12 16 269 8 81 12 16 532 10672 7 4 249 243 39 564 37 26 230 53 1020 74 61 5342 8044 13 440 4 2756 33 222 5 8 4 2671 2461 70 30 1202 195 19 533 5 7539 14 22 17 112 16375 8 4 897 289 201 300 4964 24 30 2644 12 466 10222 91 7 4 2756 2"
+}

@@ -60,7 +60,7 @@ def mutate_lime(tokens, explanations, label):
 
     Input:
     token: list of unpadded word indices
-    explanations: 20x2 list of (index, attribution)
+    explanations: lengthx2 list of (index, attribution)
 
     """
     assert tokens[0] != 0, "tokens must be unpadded"
@@ -91,7 +91,7 @@ def mutate_lime(tokens, explanations, label):
             location = find_word_location(indices2words(tokens), ID_TO_WORD[index]) # log.info(f"Token {index} not found in tokens: {tokens}")
 
             if location == -1 or location == 0:
-                print(f"Token {index}-{ID_TO_WORD[index]} not found in tokens: {tokens}-{indices2words(tokens)}")
+                # print(f"Token {index}-{ID_TO_WORD[index]} not found in tokens: {tokens}-{indices2words(tokens)}")
                 continue
             else:
                 locations.append(location)
@@ -289,9 +289,7 @@ def find_adj_adv(words_list):
             ad_id.append(i)
     return adjs_advs, ad_id
 
-def remove_if_next_to_and(lst, locations):
 
-    return to_remove
 
 
 if __name__ == "__main__":

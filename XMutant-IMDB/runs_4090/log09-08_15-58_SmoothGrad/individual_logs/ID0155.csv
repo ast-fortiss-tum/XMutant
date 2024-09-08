@@ -1,0 +1,4 @@
+id,generation,expected_label,predicted_label,misbehaviour,confidence,text
+155,1,0,0,False,0.9203634858131409,<start> this movie is one of the poorest adaptations of a fabulous book that i've seen jean george's novel is a fantastic book that i think is an outstanding read for any child i can't give the same <unk> to this movie
+155,2,0,0,False,0.782738983631134,<start> this movie is one of the poorest adaptations of a fabulous book that i've seen jean george's novel is a fantastic book that i think is an outstanding read for any child i can't give the same and like <unk> to this movie
+155,3,0,1,True,0.6484015583992004,<start> this movie is one of the poorest adaptations of a fabulous and mythological book that i've seen jean george's novel is a fantastic book that i think is an outstanding read for any child i can't give the same and like <unk> to this movie

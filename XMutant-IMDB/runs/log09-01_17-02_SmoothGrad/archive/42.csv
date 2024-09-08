@@ -1,2 +1,0 @@
-id,expected_label,predicted_label,misbehaviour,confidence,timestamp,elapsed
-42,1,0,False,0.996896505355835,1725202949.8416002,23.0807888507843

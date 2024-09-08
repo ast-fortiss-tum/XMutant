@@ -230,7 +230,7 @@ def smooth_grad(model, X, target_class):
     return saliency_map
 
 
-def integrated_gradients(model, X, target_class, steps=5): # 10
+def integrated_gradients(model, X, target_class, steps=10): # 10
     if isinstance(X, tf.Tensor):
         X = X.numpy()
     ig = IntegratedGradients(model,

@@ -1,0 +1,11 @@
+{
+    "confidence": "0.6511390805244446",
+    "elapsed": "25.944966554641724",
+    "expected_label": "0",
+    "id": "7",
+    "misbehaviour": "True",
+    "predicted_label": "1",
+    "text": "<start> is probably the word i'd use to try and start describing this film i only watched it because it had a good rating on here and i was so let down br br basically the film is about racial discrimination in a post 9 11 america and the conductor went at it with a sledge hammer there was no subtlety in the film at all and it felt as though they live trying to achieve a kind of magnolia feel to the film which is never a good and expert idea as that film was trey hours of tedium and confusion only for it to start raining <unk> at the end br br all in all a huge dashing hopes",
+    "timestamp": "1725804162.9933932",
+    "token": "1 9 242 4 681 474 361 8 353 5 380 6060 14 22 13 64 296 12 88 12 69 6 52 675 23 133 5 13 16 38 387 180 10 10 691 4 22 9 44 4346 13463 11 6 1208 790 1502 938 5 4 7756 435 33 12 19 6 15461 4225 50 16 57 4211 11 4 22 33 32 5 12 421 17 151 36 412 269 8 2715 6 243 7 11269 235 8 4 22 63 9 115 6 52 5 2809 326 17 15 22 16 11173 634 7 8918 5 2951 64 18 12 8 380 15204 2 33 4 130 10 10 32 11 32 6 666 6675 1915"
+}

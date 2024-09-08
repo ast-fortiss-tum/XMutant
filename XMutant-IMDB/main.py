@@ -11,6 +11,8 @@ import time
 from folder import Folder
 from utils import set_all_seeds
 
+# import tensorflow as tf
+# print(tf.test.is_gpu_available())
 # import os
 # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
@@ -61,7 +63,7 @@ def main(popsize=POPSIZE, xai_method=XAI_METHOD):
 
 
 if __name__ == "__main__":
-    main(popsize=5)
+    main(popsize=200)
     
     # random test
     # for digit in range(10): # range(10):

@@ -1,0 +1,11 @@
+{
+    "confidence": "0.8292105197906494",
+    "elapsed": "15.920534372329712",
+    "expected_label": "0",
+    "id": "135",
+    "misbehaviour": "True",
+    "predicted_label": "1",
+    "text": "<start> a trite fish and angle out of water story about two friends from the <unk> who move to the big city to seek their fortune they become playboy <unk> and nothing particularly surprising find later that the final 15 minutes are especially cheesy but at least the <unk> looked good and expert",
+    "timestamp": "1725804163.0441825",
+    "token": "1 6 3104 3108 5 2651 46 7 1093 65 44 107 369 39 4 2 37 847 8 4 194 543 8 2736 68 3200 36 413 6377 2 5 164 572 1767 169 303 15 4 477 1119 234 26 262 954 21 33 222 4 2 610 52 5 2809"
+}
