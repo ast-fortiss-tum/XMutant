@@ -1,8 +1,5 @@
 import tensorflow as tf
 import numpy as np
-from nltk.app.wordnet_app import explanation
-from tensorflow.python.ops.numpy_ops import positive
-# from tensorflow_probability.python.internal.backend.jax import negative
 
 from tf_keras_vis.utils.scores import BinaryScore
 from tf_keras_vis.saliency import Saliency
@@ -222,7 +219,7 @@ def smooth_grad(model, X, target_class):
     # Generate saliency map with smoothing that reduce noise by adding noise
     saliency_map = saliency(BinaryScore(target_class),
                             X,
-                            smooth_samples=2,  # The number of calculating gradients iterations. 20
+                            smooth_samples=10,  # The number of calculating gradients iterations. 20
                             smooth_noise=0.20, # noise spread level.
                             #gradient_modifier=None,
                             normalize_map=False, # normalize to (1., 0.).
@@ -293,6 +290,7 @@ def lime_batch_explainer(prediction_function, indices_list, length_explanation=L
 
         explanation = [(WORD_TO_ID.get(word, DEFAULT_WORD_ID["<unk>"]), attribution) for (word, attribution) in exp.as_list()]
         explanations.append(explanation)
+
     return explanations
 
 
@@ -305,13 +303,14 @@ if __name__ == "__main__":
     print(X_test.shape, y_test.shape)
 
     predictor = Predictor()
-    # prediction = predictor.predict(X_test)
-    # print(prediction)
-    #
-    # explanation = xai_embedding(predictor.model, X_test[0], "IntegratedGradients")
+    prediction = predictor.predict(X_test)
+    print(prediction)
+
+    # explanation = xai_embedding(predictor.model, X_test[0], "SmoothGrad", y_test[0])
     # print(explanation.shape)
-    # explanations = xai_embedding(predictor.model, X_test, "IntegratedGradients")
-    # print(explanations.shape)
+    #y_test = y_test
+    explanations = xai_embedding(predictor.model, X_test, "SmoothGrad", list(y_test))
+    print(explanations.shape)
 
 
     text = indices2words(X_test[0])

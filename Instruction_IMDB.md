@@ -1,7 +1,7 @@
-# Test Input Generator for MNIST - Detailed Installation Guide #
+# Test Input Generator for IMDB - Detailed Installation Guide #
 
 ## General Information ##
-This folder contains the application of the XMutant approach to the handwritten digit classification problem.
+This folder contains the application of the XMutant approach to the IMDB sentiment analysis problem.
 This tool is developed in Python. These instructions are for python 3.8.
 
 ## Dependencies ##
@@ -9,7 +9,7 @@ This tool is developed in Python. These instructions are for python 3.8.
 ### 1. Environment ###
 Install [conda](https://docs.conda.io/en/latest/miniconda.html#) and create an environment with `python 3.8`
 
-[/XMutant/environment_MNIST_IMDB .yml](/XMutant/environment_MNIST_IMDB.yml)
+[/XMutant/environment_MNIST_IMDB.yml](/XMutant/environment_MNIST_IMDB.yml)
 
 ```
 conda create -n xmutant python=3.8
@@ -22,7 +22,10 @@ conda activate xmutant
 ### Input ###
 
 * A trained model in h5 format. The default one is in the folder `models`;
-* A list of seeds used for the input generation. The default list is in the folder `original_dataset`;
+* Download nltk dataset and WordNet dataset.
+```
+python download.py
+```
 * `config.py` containing the configuration of the tool selected by the user.
 
 ### Output ###

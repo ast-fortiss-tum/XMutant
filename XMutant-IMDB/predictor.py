@@ -1,21 +1,10 @@
 # For Python 3.6 we use the base keras
 import tensorflow as tf
-from numpy.ma.core import indices
 from tensorflow import keras
-import pickle
-# from properties import MODEL, EXPECTED_LABEL
-from tensorflow.keras.preprocessing.sequence import pad_sequences
 import numpy as np
-from tensorflow.keras.datasets import imdb
-import re
-import string
 
-# from properties import INPUT_MAXLEN
-from config import (MAX_SEQUENCE_LENGTH, NUM_DISTINCT_WORDS,MODEL,
-                    EMBEDDING_OUTPUT_DIMS,DEFAULT_WORD_ID, INDEX_FROM)
-from utils import (#WORD_TO_ID, ID_TO_WORD, indices2words,
-                   words2indices, pad_inputs
-                  )
+from config import (MAX_SEQUENCE_LENGTH, NUM_DISTINCT_WORDS,MODEL)
+from utils import (words2indices, pad_inputs)
 
 class Predictor:
 
