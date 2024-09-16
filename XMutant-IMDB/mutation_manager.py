@@ -1,14 +1,11 @@
 import random
 import logging as log
-import sys
-from xai_imdb import top_k_attributions
 
+from xai_imdb import top_k_attributions
+import sys
 # log.basicConfig(stream=sys.stdout, level=log.DEBUG)
 import numpy as np
-# from features import neg_words, pos_words
-from config import NUM_DISTINCT_WORDS, MAX_ATTEMPT
 from utils import indices2words, words2indices, ID_TO_WORD, WORD_TO_ID, find_word_location
-# from properties import INPUT_MAXLEN
 from nltk.corpus import wordnet
 import nltk
 
@@ -303,28 +300,8 @@ if __name__ == "__main__":
     #                    2.5889685e-05, 2.3884184e-05, 2.3466435e-05, 2.2520195e-05])
     # locations = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20])
 
-    #[19,  1580 , 2354,     8,  2579  3916  2835   157  9494    17  5704   713 7516  8844  1639    22  4650    37  4611 12459]
     indices = np.array([19, 1580, 2354, 8, 2579, 3916, 2835, 157, 9494, 17, 5704, 713, 7516, 8844, 1639, 22, 4650, 37, 4611, 12459,
                         38])
-    # [0.4539333, 0.25433126,
-    # 0.20099907
-    # 0.19521411
-    # 0.19221331
-    # 0.18454358
-    # 0.18154374
-    # 0.17476512
-    # 0.1699163
-    # 0.15491284
-    # 0.1545332
-    # 0.15090293
-    # 0.14655387
-    # 0.14452878
-    # 0.14290535
-    # 0.14032906
-    # 0.13923967
-    # 0.13889316
-    # 0.13619153
-    # 0.1338239]
     weights = np.array([0.4539333, 0.25433126, 0.20099907, 0.19521411, 0.19221331, 0.18454358, 0.18154374,
                         0.17476512, 0.1699163, 0.15491284, 0.1545332, 0.15090293, 0.14655387,
                         0.14452878, 0.14290535, 0.14032906, 0.13923967, 0.13889316, 0.13619153, 0.1338239,

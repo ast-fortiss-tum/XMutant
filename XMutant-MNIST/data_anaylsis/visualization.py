@@ -158,13 +158,11 @@ def hist_plot(mutation_iterations, iteration):
     plt.ylabel('Frequency')
     plt.title('Histogram of Mutation iteration')
 
-
 def line_plot(number_per_iteration, title=""):
     plt.plot(number_per_iteration)
     plt.xlabel('Mutation iterations')
     plt.ylabel('Number of misbehaviours')
     plt.title(title)
-
 
 def stat_1_config(xai: str, method: str, length=1000):
     end_name = method + xai
@@ -410,14 +408,16 @@ def two_plot():
 
     plt.plot(df_xai_sm["idx"], df_xai_sm["ID_cum_rate_0.95"])
     plt.plot(df_xai_gc["idx"], df_xai_gc["ID_cum_rate_0.95"])
-    plt.plot(df_xai_fsc["idx"], df_xai_fsc["ID_cum_rate_0.95"])
+    # plt.plot(df_xai_fsc["idx"], df_xai_fsc["ID_cum_rate_0.95"])
     plt.plot(df_random["idx"], df_random["ID_cum_rate_0.95"], "k--")
 
-    plt.title("Validity rate by VAE validator")
+    plt.title("MNIST: Validity by SelfOracle")
     #plt.ylabel("validity rate")
     plt.ylim([0.68, 1.02])
     #plt.xlabel("Iteration")
-    plt.legend(["SmoothGrad \nvalidity rate", "Grad-CAM++\nvalidity rate", "Score-CAM\nvalidity rate", "Random\nvalidity rate"], bbox_to_anchor=(1., 0.5), loc='center left')
+    plt.legend(["SmoothGrad \nvalidity rate", "Grad-CAM++\nvalidity rate",
+                #"Score-CAM\nvalidity rate",
+                "DeepJanus\nvalidity rate"], bbox_to_anchor=(1., 0.5), loc='center left')
 
 
     """plt.subplot(2,1,2)
@@ -517,8 +517,8 @@ def two_plot():
     plt.errorbar(df_cumulative_random['idx'], df_cumulative_random['mean_preservation_rate'],
                  yerr=df_cumulative_random['std_preservation_rate'], linestyle='dashed', label="random")"""
 
-    plt.legend(["XMutant \nvalidity rate", "Random \nvalidity rate", "XMutant \npreservation rate",
-                "Random \npreservation rate"], bbox_to_anchor=(1., 0.5),
+    plt.legend(["XMutant \nvalidity rate", "DeepJanus \nvalidity rate", "XMutant \npreservation rate",
+                "DeepJanus \npreservation rate"], bbox_to_anchor=(1., 0.5),
                # fontsize="12",
                loc='center left')
 
@@ -566,7 +566,7 @@ def two_plot():
 
     plt.ylim([0.3, 1.01])
     #plt.xlim([0, 1005])
-    plt.title("Human assessments")
+    plt.title("MNIST: Validity by Human Assessments")
     plt.xlabel('iteration')
 
     plt.tight_layout()
@@ -574,10 +574,10 @@ def two_plot():
 
 if __name__ == "__main__":
     print(os.getcwd())
-
-    if os.getcwd().split("/")[-1] != "XMutant-MNIST":
-        print("change directory")
-        os.chdir("../")
+    print(os.path.exists("../result/csv_folder/cumulative_clear_validity_rate_record_C_C_sm.csv"))
+    # if os.getcwd().split("/")[-1] != "XMutant-MNIST":
+    #     print("change directory")
+    #     os.chdir("../")
 
 
     #main_stat()

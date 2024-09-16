@@ -8,7 +8,7 @@ from natsort import natsorted
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-import csv_logger
+# import csv_logger
 from stat_tests import run_wilcoxon_and_cohend, run_wilcoxon, cohend
 
 
@@ -578,6 +578,131 @@ def dqd_plot_simple2(dqd_path="../results/csvs/summary_driving_quality.csv"):
     fig.tight_layout()
     plt.show()
 
+def dqd_plot_simple_horizontal(dqd_path="../results/csvs/summary_driving_quality.csv"):
+    df_dq = pd.read_csv(dqd_path)
+    # print(df_dqd["method combi"].unique())
+    sns.set_theme(style="whitegrid")
+
+
+    keys_simple = [
+        "cte_max_before","cte_max_after","steering_l2_before","steering_l2_after","combi"
+    ]
+
+    # df_stat = pd.DataFrame(index=df_dqd['method combi'].unique())
+    # only need FSC and GC for plot
+    df_dq = df_dq[(df_dq['mutation type'].str.contains('RANDOM'))
+                    #| (df_dq['mutation type'].str.contains("FSC"))
+                    | (df_dq['mutation type'].str.contains("GC"))]
+    df_dq["combi"] = df_dq["mutation type"] + "_" +df_dq["mutation method"]
+
+
+    df_dq = df_dq[keys_simple]
+
+    df_dq = df_dq.dropna()
+
+    df_dq["cte_max"] = df_dq["cte_max_after"] - df_dq["cte_max_before"]
+    df_dq["steering_l2"] = df_dq["steering_l2_after"] - df_dq["steering_l2_before"]
+
+    df_dqd_cte = df_dq[["combi","cte_max"]]
+    df_dqd_cte["type"] = "cte_max"
+    df_dqd_cte = df_dqd_cte.rename(columns={'cte_max': 'value'})
+
+    df_dqd_steer = df_dq[["combi","steering_l2"]]
+
+    df_dqd_steer = df_dqd_steer.rename(columns={'steering_l2': 'value'})
+    df_dqd_steer["type"] = "steering_l2"
+    df_dqd_plot = pd.concat([df_dqd_cte,df_dqd_steer], ignore_index=True)
+
+    """for combi in ['RANDOM_FSC_random', 'XAI_GC_random', 'XAI_GC_attention_same', 'XAI_FSC_random']:
+        print("-------------" + combi + "-------------")
+        print("---cte_max")
+        run_wilcoxon(df_dq[df_dq['combi'] == combi]["cte_max"])
+        cohensd = cohend(df_dq[df_dq['combi'] == combi]["cte_max_before"], df_dq[df_dq['combi'] == combi]["cte_max_after"])
+        print(f"Cohen's D is: {cohensd}")
+        print("---steering_l2")
+        run_wilcoxon(df_dq[df_dq['combi'] == combi]["steering_l2"])
+        cohensd = cohend(df_dq[df_dq['combi'] == combi]["steering_l2_before"], df_dq[df_dq['combi'] == combi]["steering_l2_after"])
+        print(f"Cohen's D is: {cohensd}")"""
+    # plot
+    fig, ax1 = plt.subplots(figsize=(7.8, 5.51))
+    ax2 = ax1.twiny()
+    sns.set_theme(style="ticks", palette="pastel")
+
+    v1 = sns.violinplot(ax=ax1,
+                        y="combi", x="value",
+                        hue=True,
+                        hue_order=[True, False],
+                        data=df_dqd_cte,
+                        split=True,
+                        inner="quart",
+                        # showfliers=False,  # don't show outliers
+                        # showmeans=True,
+                        palette=["m"],
+                        linewidth=0.5,
+                        # legend=['CTE']
+                        order=['RANDOM_FSC_random', 'XAI_GC_random', 'XAI_GC_attention_same']# , 'XAI_FSC_random'
+                        )
+
+
+    v2 = sns.violinplot(ax=ax2,
+                        y="combi",x="value",
+
+                        hue=True,
+                        hue_order=[False, True],
+                        data=df_dqd_steer,
+                        split=True,
+                        inner="quart",
+                        # showfliers=False,  # don't show outliers
+                        # showmeans=True,
+                        palette = ["g"],
+                        legend = None,
+                        linewidth=0.5,
+                        order=['RANDOM_FSC_random', 'XAI_GC_random', 'XAI_GC_attention_same']# , 'XAI_FSC_random'
+                        )
+
+
+
+
+    p1 = sns.pointplot(ax=ax1, y="combi", x="value",hue="type",
+                       marker="|", markersize=20, markeredgewidth=3, linestyle="none",
+                       order=['RANDOM_FSC_random', 'XAI_GC_random', 'XAI_GC_attention_same'],
+                    data=df_dqd_cte, estimator=np.mean, palette = ["darkred"],legend = None)
+    p2 = sns.pointplot(ax=ax2, y="combi", x="value", hue="type",
+                       marker="|", markersize=20, markeredgewidth=3,linestyle="none",
+                       order=['RANDOM_FSC_random', 'XAI_GC_random', 'XAI_GC_attention_same'],# , 'XAI_FSC_random'
+                    data=df_dqd_steer, estimator=np.mean,color = "seagreen",legend = None)
+
+    #fig.legend([v1,v2,p1,p2 ], labels=[['CTE'], ['steering'], ['CTE mean'], ['steering mean']], loc="upper right")
+
+    labs = ["cte","steer","1","2"]
+    ax1.set_yticklabels(['DeepJanus', 'Grad-CAM++ random', 'Grad-CAM++ high', 'Score-CAM random'],fontsize=14
+                        # rotation=15
+                        )
+
+    #ax1.legend(lns, labs, loc=0)
+    # Move the legend for ax1 to the right of the plot
+
+    # ax1.legend(["CTE"],loc='lower right')
+    # ax2.legend(["Steering"],loc='upper left')
+    ax2.set_xlim([-0.4,1.2])
+    ax1.set_xlim([-2,1.5])
+    ax1.set_xticks(np.linspace(-1, 1.5, 6))
+    ax2.set_xticks(np.linspace(-0.25, .75, 5))
+    # ax1.set_title('Driving Quality Degradations')
+
+
+    ax1.set_ylabel('')
+    ax1.set_xlabel('DQD of CTEs')
+    ax1.xaxis.set_label_coords(0.1, -0.025)
+    ax2.set_xlabel('DQD of Steering Angles')
+    ax2.xaxis.set_label_coords(0.85, 1.025)
+
+    ax1.legend(["CTE"],bbox_to_anchor=(0.82, 0.1), loc='lower left', borderaxespad=0,fontsize=14)
+    ax2.legend(["Steering"],bbox_to_anchor=(0.02, 0.9), loc='upper left', borderaxespad=0,fontsize=14)
+
+    fig.tight_layout()
+    plt.show()
+
 
 def read_global_log(global_csv_path):
     # path : "simulations_simple/simulations_15_nodes_60_seeds/global_log.csv",
@@ -787,4 +912,6 @@ if __name__ == "__main__":
 
     # ----------------------------------- dqd plot -------------------------------------
     #dqd_plot_simple(dqd_path='../results/csvs/summary_increment_all.csv')
-    dqd_plot_simple2()
+    # dqd_plot_simple2()
+
+    dqd_plot_simple_horizontal()

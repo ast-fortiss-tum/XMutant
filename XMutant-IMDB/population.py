@@ -3,14 +3,12 @@ import numpy as np
 from os.path import join, exists
 import csv
 
-
-from nltk.app.wordnet_app import explanation
 from tensorflow.keras.datasets import imdb
-from config import (POPSIZE, REPORT_NAME, MUTATION_RECORD, NGEN, XAI_METHOD)
+from config import (POPSIZE, REPORT_NAME, MUTATION_RECORD, XAI_METHOD)
 from config import (MAX_SEQUENCE_LENGTH, NUM_DISTINCT_WORDS,
-                    EMBEDDING_OUTPUT_DIMS,DEFAULT_WORD_ID, INDEX_FROM)
+                    DEFAULT_WORD_ID, INDEX_FROM)
 from individual import Individual
-from xai_imdb import xai_embedding, lime_batch_explainer, manual_saliency_map_embedding
+from xai_imdb import xai_embedding, lime_batch_explainer
 import utils
 from predictor import Predictor
 from mutation_manager import mutate, mutate_lime
@@ -206,6 +204,5 @@ if __name__ == "__main__":
         print([ind.confidence for ind in pop.population_to_mutate])
         pop.mutate_population()
 
-        # print([get_distance(digit_ini[i], digit_cur[i]) for i in range(POPSIZE)])
 
     print(f" Misclass number {pop.misclassified_number}")

@@ -1,4 +1,3 @@
-import csv
 import utils
 import predictor
 import time

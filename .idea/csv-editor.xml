@@ -3,6 +3,13 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="/XMutant-IMDB/csv_results/integratedgradients_4090.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/XMutant-IMDB/opinion-lexicon-English/negative-words-pol.csv">
           <value>
             <Attribute>
@@ -24,13 +31,6 @@
             </Attribute>
           </value>
         </entry>
-        <entry key="/XMutant-IMDB/runs/log09-02_23-09_Lime/individual_logs/ID0126.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
         <entry key="/XMutant-IMDB/runs_server/runs/summary.csv">
           <value>
             <Attribute>
@@ -45,7 +45,35 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/XMutant-LK-ADS/results/csvs/summary_driving_quality.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/XMutant-MNIST/result/csv_folder/cumulative_clear_validity_rate_record_C_C_GC.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/XMutant-MNIST/result/csv_folder/cumulative_misclassified_all.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/XMutant-MNIST/result/csv_folder/record_R_R.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/XMutant-MNIST/result/human assessment/log.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -67,13 +95,6 @@
           </value>
         </entry>
         <entry key="/XMutant-MNIST/runs/summary.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="$USER_HOME$/dataset/final-test2/log03-07_23-46_0_C_C_IG/individual_logs/0.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

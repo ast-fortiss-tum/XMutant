@@ -1,5 +1,3 @@
-from babel.plural import in_range_list
-from nltk.corpus import wordnet
 import random
 from tensorflow.keras.datasets import imdb
 from tensorflow.keras.preprocessing.sequence import pad_sequences

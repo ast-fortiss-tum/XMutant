@@ -2,18 +2,18 @@
 
 ## General Information ##
 This folder contains the application of the XMutant approach to the handwritten digit classification problem.
-This tool is developed in Python. These instructions are for Ubuntu 18.04 (bionic) OS and python 3.8.
+This tool is developed in Python. These instructions are for python 3.8.
 
 ## Dependencies ##
 
 ### 1. Environment ###
 Install [conda](https://docs.conda.io/en/latest/miniconda.html#) and create an environment with `python 3.8`
 
-[/XMutant/environment_MNIST.yml](/XMutant/environment_MNIST.yml)
+[/XMutant/environment_MNIST_IMDB .yml](/XMutant/environment_MNIST_IMDB.yml)
 
 ```
-conda create -n xmutant-mnist python=3.8
-conda activate xmutant-mnist
+conda create -n xmutant python=3.8
+conda activate xmutant
 ```
 
 

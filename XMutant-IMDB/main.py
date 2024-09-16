@@ -24,10 +24,6 @@ def main(popsize=POPSIZE, xai_method=XAI_METHOD):
     pop = Population(pop_size=popsize, xai_method=xai_method)
     print(f" Population size {pop.size}")
 
-    # Collect data
-    field_names = ["id", "misclass ", "predicted label"]
-    data = []
-
     folder = Folder(xai_method=xai_method)
     condition = True
     gen = 1
@@ -63,7 +59,7 @@ def main(popsize=POPSIZE, xai_method=XAI_METHOD):
 
 
 if __name__ == "__main__":
-    main(popsize=200)
+    main(popsize=3)
     
     # random test
     # for digit in range(10): # range(10):
