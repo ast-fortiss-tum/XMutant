@@ -4,40 +4,41 @@ from deap import base, creator, tools
 from deap.tools.emo import selNSGA2
 import h5py
 
+from attention_manager import  AttentionManager
 import vectorization_tools
 from mnist_member import MnistMember
 from digit_mutator import DigitMutator
 
 from predictor import Predictor
 from timer import Timer
-from utils import print_archive, print_archive_experiment, set_all_seeds, load_data, load_icse_data, check_label
+from utils import print_archive, print_archive_experiment, set_all_seeds, load_data, load_mnist_test, check_label, load_fmnist_test
 import archive_manager
 from individual import Individual
-from config import NGEN, \
+from config import NGEN, XMUTANT_CONFIG,\
     POPSIZE, INITIALPOP, \
-    RESEEDUPPERBOUND, GENERATE_ONE_ONLY, DATASET, \
+    RESEEDUPPERBOUND, GENERATE_ONE_ONLY, DATASET_NAME, \
     STOP_CONDITION, STEPSIZE, DJ_DEBUG, SEED, EXPLABEL, DATALOADER
+# XMUTANT_CONFIG = {"xai":ATTENTION, "selection": CONTROL_POINT, "direction": MUTATION_TYPE}
+
 
 set_all_seeds(seed=SEED)
+
+attention_manager = AttentionManager(num=EXPLABEL, attention_method=XMUTANT_CONFIG['xai'])
 
 
 if DATALOADER == 'normal':
     # original data
     (x_test, y_test) = load_data()
-elif DATALOADER == 'mimicry':
+elif DATALOADER == 'xmutant':
     # icse data as baseline
-    x_test1, y_test1, image_files1 = load_icse_data(confidence_is_100=True, label=EXPLABEL)
-    x_test2, y_test2, image_files2 = load_icse_data(confidence_is_100=False, label=EXPLABEL)
-    x_test = np.concatenate([x_test1, x_test2], axis=0)
-    y_test = np.concatenate([y_test1, y_test2], axis=0)
-    image_files = np.concatenate([image_files1, image_files2], axis=0)
+    if DATASET_NAME == "MNIST":
+        x_test, y_test = load_mnist_test(popsize=POPSIZE, number=EXPLABEL)
 
-    x_test, y_test, image_files = check_label(x_test, y_test, image_files, EXPLABEL)
-
-    POPSIZE = x_test.shape[0]
-    assert POPSIZE >= 4, "No enough data"
+    elif DATASET_NAME == "FashionMNIST":
+        x_test, y_test = load_fmnist_test(popsize=POPSIZE, number=EXPLABEL)
 else:
     raise NotImplementedError
+
 
 # Fetch the starting seeds from file
 starting_seeds = [i for i in range(len(y_test))]
@@ -62,17 +63,17 @@ def generate_digit(seed):
 def ind_from_seed(seed):
     Individual.COUNT += 1
     if not GENERATE_ONE_ONLY:
+        # generate not available with XMutant
         digit1, digit2, distance_inputs = \
             DigitMutator(generate_digit(seed)).generate()
     else:
         digit1 = generate_digit(seed)
         digit2 = digit1.clone()
-        distance_inputs = DigitMutator(digit2).mutate()
+        distance_inputs = DigitMutator(digit2).mutate(reference=digit1, selection="random", direction="random_cycle")
 
     individual = creator.Individual(digit1, digit2)
     individual.members_distance = distance_inputs
     individual.seed = seed
-    individual.original_image = image_files[int(seed)]
     return individual
 
 
@@ -104,9 +105,9 @@ def reseed_individual(seeds):
 
 # Evaluate an individual.
 def evaluate_individual(individual, current_solution):
-    individual.evaluate(current_solution)
-    return individual.aggregate_ff, individual.misclass
-
+    aggregate_ff,misclass = individual.evaluate(current_solution)
+    # return individual.aggregate_ff, individual.misclass
+    return aggregate_ff, misclass
 
 def mutate_individual(individual):
     Individual.COUNT += 1
@@ -139,17 +140,27 @@ def pre_evaluate_batch(invalid_ind):
 
     batch_label = ([m.expected_label for m in batch_members])
 
+    if XMUTANT_CONFIG["xai"] is not None:
+        attmaps = attention_manager.compute_attention_maps(batch_img)
+    else:
+        attmaps = [None] * len(batch_img)
+
     predictions, confidences = (Predictor.predict(img=batch_img,
                                                   label=batch_label))
 
-    for member, prediction, confidence \
-            in zip(batch_members, predictions, confidences):
+    for member, prediction, confidence, attmap \
+            in zip(batch_members, predictions, confidences, attmaps):
         member.confidence = confidence
         member.predicted_label = prediction
         if member.expected_label == member.predicted_label:
             member.correctly_classified = True
         else:
             member.correctly_classified = False
+        member.attention = attmap
+        if attmap is not None:
+            member.activation_level = np.mean(attmap)
+        else:
+            member.activation_level = 0
 
 
 def main(rand_seed=None):
@@ -197,10 +208,12 @@ def main(rand_seed=None):
     # Begin the generational process
     condition = True
     gen = 1
+
+
     while condition:
         # Vary the population.
         # offspring = tools.selTournamentDCD(population, len(population))
-        offspring = tools.selTournamentDCD(population, k=len(population)//4*4) # k must be divisible by four
+        offspring = tools.selTournamentDCD(population, k=len(population)) # k must be divisible by four
         offspring = [toolbox.clone(ind) for ind in offspring]
 
         # Reseeding
@@ -231,9 +244,13 @@ def main(rand_seed=None):
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
 
+        archive_candidate_counter = 0
         for ind in population + offspring:
             if ind.archive_candidate:
                 archive.update_archive(ind)
+                archive_candidate_counter += 1
+        # Q: archived inds still in population??
+        # Q: archived inds will be mutated??
 
         # Select the next generation population
         population = toolbox.select(population + offspring, POPSIZE)
@@ -244,7 +261,7 @@ def main(rand_seed=None):
         # Update the statistics with the new population
         record = stats.compile(population)
         logbook.record(gen=gen, evals=len(invalid_ind), **record)
-        print(logbook.stream)
+        print(logbook.stream, "archive_candidate_counter", archive_candidate_counter)
         gen += 1
 
         if STOP_CONDITION == "iter":

@@ -1,13 +1,11 @@
 from keras.layers import Input
-from keras.utils import to_categorical
-from adversarial_methods.MNIST_deepXplore.utils import *
+# from keras.utils import to_categorical
+from adversarial_methods.DeepXplore.utils import *
 import numpy as np
-import random
-import imageio
+
 from predictor import Predictor
 import tensorflow as tf
-from utils import set_all_seeds
-from population import load_mnist_test
+from utils import set_all_seeds, load_mnist_test
 from config import POPSIZE
 import csv
 from PIL import Image
@@ -22,13 +20,17 @@ def init_coverage_tables_single(model1):# (model1, model2, model3):
     return model_layer_dict1# , model_layer_dict2, model_layer_dict3
 
 # Parameters (replace these with your desired values or use argparse as needed)
+
 transformation = 'occl'  # Options: 'light', 'occl', 'blackout'
+start_point=(0, 0)
+rect_shape=(10, 10)
+
 weight_diff = 1
 weight_nc = 0.1
 weight_vae = 0
 step = 0.1
-seeds = 50
-grad_iterations = 2500
+#seeds = 50
+grad_iterations = 150
 threshold = 0.0
 target_model = 0
 pop_size = POPSIZE
@@ -37,9 +39,9 @@ pop_size = POPSIZE
 img_rows, img_cols = 28, 28
 input_shape = (img_rows, img_cols, 1)
 
-img_dir = "./result/deepxplore_digits/"
+img_dir = "result/deepxplore_digits_occ_mid/"
 os.makedirs(img_dir, exist_ok=True)
-csv_file = "./result/deepxplore_digits/record_deepxplore.csv"
+csv_file = "result/deepxplore_digits_occ_mid/record_deepxplore.csv"
 
 for digit in range(10):  # range(10):
     set_all_seeds(digit)
@@ -109,7 +111,7 @@ for digit in range(10):  # range(10):
             if transformation == 'light':
                 grads_value = constraint_light(grads)
             elif transformation == 'occl':
-                grads_value = constraint_occl(grads, start_point=(0, 0), rect_shape=(10, 10))
+                grads_value = constraint_occl(grads, start_point=start_point, rect_shape=rect_shape)
             elif transformation == 'blackout':
                 grads_value = constraint_black(grads)
 

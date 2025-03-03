@@ -24,7 +24,7 @@ validation_split = 0.20
 print(x_train.shape)
 print(x_test.shape)
 
-# Here, you'd normally test first that the model generalizes and concatenate all data
+# Here, you'd normally vit_model first that the model generalizes and concatenate all data
 # (that is, normally, you'd perform e.g. K-fold Cross Validation first)
 # Then, you can use all data for a full training run. Now, we'll use x_train for training only.
 

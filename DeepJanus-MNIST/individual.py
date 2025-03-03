@@ -24,7 +24,6 @@ class Individual:
         self.archive_candidate = None
         self.m1 = member1
         self.m2 = member2
-        self.original_image: str = ""
 
 
     def reset(self):
@@ -41,8 +40,7 @@ class Individual:
                 #TODO: expected label depending on member
                 'expected_label': str(EXPLABEL),
                 'm1': str(self.m1.id),
-                'm2': str(self.m2.id),
-                'original_image': self.original_image
+                'm2': str(self.m2.id)
         }
 
     def export(self):
@@ -79,7 +77,7 @@ class Individual:
         self.aggregate_ff = evaluator.evaluate_aggregate_ff(self.sparseness,
                                                             self.members_distance)
 
-        return self.aggregate_ff, self.misclass
+        return self.aggregate_ff, self.misclass + (self.m1.activation_level + self.m2.activation_level)
 
     def mutate(self):
         raise NotImplemented()

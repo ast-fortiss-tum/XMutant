@@ -8,9 +8,6 @@ from config import MUTLOWERBOUND, MUTUPPERBOUND, \
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-
-
-
 NAMESPACE = '{http://www.w3.org/2000/svg}'
 
 
@@ -261,7 +258,7 @@ def end_or_middle_points(svg_path, mode):
     AM_get_attention_svg_points_images_mth2 Calculate the attention score around each SVG path point and return a list of
     points (tuples) and the respective non-uniform distribution weights for all the SVG path points
 
-    :param images: images should have the shape: (x, 28, 28) where x>=1
+    :param vit_model: vit_model should have the shape: (x, 28, 28) where x>=1
     :param sqr_size: X and Y size of the square region
     :param model: The model object that will predict the value of the digit in the image
     :return: A a list of points (tuples) and the respective non-uniform distribution weights for all the SVG path points.

@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     set_random_seed(seed=args.seed)
 
-    # 1 plus 1 test generator
+    # 1 plus 1 vit_model generator
     test_generator = OnePlusOneTestGenerator(map_size=250, num_control_nodes=args.num_control_nodes)
 
     env = UdacityGymEnv(

@@ -9,12 +9,12 @@ from tf_keras_vis.utils import num_of_gpus
 import numpy as np
 from predictor import Predictor
 
-from config import POPSIZE, ATTENTION
+from config import XMUTANT_CONFIG #POPSIZE, ATTENTION
 # import keras
 
 
 class AttentionManager:
-    def __init__(self, num, attention_method=ATTENTION):
+    def __init__(self, num, attention_method=XMUTANT_CONFIG['xai']):
         self.digit = num
         self.score = CategoricalScore(self.digit)
         self.replace2linear = ReplaceToLinear()
@@ -46,7 +46,7 @@ class AttentionManager:
         saliency_map = saliency(self.score, X)
         return saliency_map
 
-    def smooth_grad(self, X):
+    def smooth_grad(self, X, normalize_map=True):
         # Create Saliency object.
         saliency = Saliency(self.model,
                             model_modifier=self.replace2linear,
@@ -55,11 +55,12 @@ class AttentionManager:
         # Generate saliency map with smoothing that reduce noise by adding noise
         saliency_map = saliency(self.score,
                                 X,
-                                smooth_samples=2,  # The number of calculating gradients iterations. 20
-                                smooth_noise=0.20)  # noise spread level.
+                                smooth_samples=5,  # The number of calculating gradients iterations. 20, 2
+                                smooth_noise=0.20,
+                                normalize_map=normalize_map)  # noise spread level.
         return saliency_map
 
-    def grad_cam(self, X):
+    def grad_cam(self, X, normalize_map=True):
         # Create Gradcam object
         gradcam = Gradcam(self.model,
                           model_modifier=self.replace2linear,
@@ -68,10 +69,11 @@ class AttentionManager:
         # Generate heatmap with GradCAM
         cam = gradcam(self.score,
                       X,
-                      penultimate_layer=-1)
+                      penultimate_layer=-1,
+                      normalize_cam=normalize_map)
         return cam
 
-    def grad_cam_pp(self, X):
+    def grad_cam_pp(self, X, normalize_map=True):
         # Create GradCAM++ object
         gradcam = GradcamPlusPlus(self.model,
                                   model_modifier=self.replace2linear,
@@ -80,7 +82,8 @@ class AttentionManager:
         # Generate heatmap with GradCAM
         cam = gradcam(self.score,
                       X,
-                      penultimate_layer=-1)
+                      penultimate_layer=-1,
+                      normalize_cam=normalize_map)
         return cam
 
     def score_cam(self, X):

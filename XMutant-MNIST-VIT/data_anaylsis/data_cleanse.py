@@ -4,24 +4,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-if os.getcwd().split("/")[-1] != "XMutant-MNIST":
-    print("change directory")
-    os.chdir("../")
+# if os.getcwd().split("/")[-1] != "XMutant-MNIST-VIT":
+#     print("change directory")
+#     os.chdir("../")
 
-csv_folder = "../result/csv_folder"
+csv_folder = "../result/digits"
 assert os.path.exists(csv_folder), f"scr_folder path {csv_folder} does not exist"
 
 # -------------------------method string-------------------------
-xais = ["_sm", "_GC", "_FSC", "_IG"]
-mutations = ["_S_R", "_C_R", "_C_C"]
+all_methods = [ "_R_R", "_C_C"]
 
-all_methods = []
-for xai in xais:
-    for mutation in mutations:
-        all_methods.append(mutation+xai)
-
-all_methods.sort(key=str.lower)
-all_methods.append("_R_R")
 print(all_methods)
 
 # ---------------------------------------------------------------
@@ -40,6 +32,35 @@ def modify_record_csv():
         record_df.to_csv(record_csv, index=False)
 
 # modify_record_csv()
+# --------------------------------------------------------------------
+def check_validity_rate_over_iteration(record_name, digit=None):
+    RESULTS_PATH = r"../result/digits/"
+    df_record = pd.read_csv(record_name)
+
+    if digit is not None:
+        df_record = df_record[df_record["expected_label"] == digit]
+
+    # ----------------------------------------------------------------
+    # df_record['ID'] = df_record['ID/OOD'].apply(lambda x:1 if x.lower()== "id" else 0)
+    df_record['one'] = 1
+    df_record['mutation_number_real'] = df_record['mutation_number_real'].astype(int)
+    df_record = df_record[df_record['mutation_number_real']!=0]
+    df_cumulative = pd.DataFrame()
+    df_cumulative["idx"] = df_record.groupby('mutation_number_real')['one'].sum().to_frame().index
+
+
+    df_cumulative["pop_num"] = df_record.groupby('mutation_number_real')['one'].sum().to_list()
+    df_cumulative["pop_cum_num"] = df_record.groupby('mutation_number_real')['one'].sum().cumsum().to_list()
+
+    df_cumulative.to_csv(os.path.join(RESULTS_PATH, "cumulative_clear_validity_rate_" + record_name.split("/")[-1]))
+
+# RESULTS_PATH = r"../result/digits"
+# folders = glob.glob(os.path.join(RESULTS_PATH, "record*.csv"))
+# print(folders)
+# for csv_file in folders:
+#     # main_xc(csv_file) #get loss
+#     # new_threshold(record_name=csv_file) # compare all thresholds
+#     check_validity_rate_over_iteration(record_name=csv_file, digit=None) # get cumulative validity rate
 # --------------------------------------------------------------------
 
 def cumulative_misclassified(if_save=False):
@@ -83,7 +104,7 @@ def paper_table():
     col_names = df_cum.columns
 
     df_cum_per_100 = pd.DataFrame(columns=df_cum.columns)
-    df_cum_per_100.idx = np.linspace(100,1000,10)
+    df_cum_per_100.idx = np.linspace(10,100,10)
 
     for index, row in df_cum_per_100.iterrows():
         iteration = row.idx

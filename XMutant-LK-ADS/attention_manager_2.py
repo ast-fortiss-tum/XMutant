@@ -111,12 +111,12 @@ class AttentionManager:
         os.makedirs(self.path_save_heatmaps)
 
     def preprocess_image(self):
-        # load images paths from filesystem and preprocess the images
+        # load vit_model paths from filesystem and preprocess the vit_model
         image_list = list(map(Image.open, self.img_paths))
 
         assert len(image_list) != 0
 
-        logger.debug("read %d images from file" % len(image_list))
+        logger.debug("read %d vit_model from file" % len(image_list))
 
         processed_images = []
 
@@ -127,7 +127,7 @@ class AttentionManager:
 
         return processed_images
 
-    def compute_attention_maps(self):  # images should have the shape: (x, 28, 28) where x>=1
+    def compute_attention_maps(self):  # vit_model should have the shape: (x, 28, 28) where x>=1
         # retrieve the control point which is closest to the hottest point
 
         prev_hm = gradient = np.zeros((config.IMAGE_HEIGHT, config.IMAGE_WIDTH))

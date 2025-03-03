@@ -21,7 +21,7 @@ class AttentionManager:
         self.model = Predictor.model
         self.attention_method = attention_method
 
-    def compute_attention_maps(self, images):  # images should have the shape: (x, 28, 28) where x>=1
+    def compute_attention_maps(self, images):  # vit_model should have the shape: (x, 28, 28) where x>=1
         X = self.get_input(images)
 
         switch = {

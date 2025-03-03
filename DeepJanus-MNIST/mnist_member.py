@@ -27,9 +27,12 @@ class MnistMember:
         self.confidence = None
         self.correctly_classified = None
         MnistMember.COUNT += 1
+        self.attention = None
+        self.activation_level = None
+        # self.mutation_point = (None, None)
 
     def clone(self):
-        clone_digit = MnistMember(self.xml_desc, self.expected_label)
+        clone_digit = MnistMember(self.xml_desc, self.expected_label, self.seed)
         return clone_digit
 
     def to_dict(self, ind_id):

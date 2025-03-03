@@ -17,6 +17,7 @@ import rasterization_tools
 import os
 import glob
 import cv2
+import gzip
 
 
 # # load the MNIST dataset
@@ -108,32 +109,84 @@ def load_data():
     return x_test, y_test
 
 
-def load_icse_data(confidence_is_100, label):
-    if confidence_is_100:
-        dataset_path = os.path.join("original_dataset/final-mnist/100/", str(label))
+# def load_xmutant_data(confidence_is_100, label):
+#     if confidence_is_100:
+#         dataset_path = os.path.join("original_dataset/final-mnist/100/", str(label))
+#     else:
+#         dataset_path = os.path.join("original_dataset/final-mnist/not_100/", str(label))
+#     # List all files in the directory
+#     image_files = glob.glob(dataset_path + '/*.png')
+#     image_files = sorted(image_files, key=lambda x: int(x.split('/')[-1].split('.')[0]))
+#     # Initialize an empty list to store the images
+#     images = []
+#
+#     # Load each image and append to the list
+#     for image_path in image_files:
+#         # Load image in grayscale mode
+#         img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+#         if img is not None:
+#             images.append(img)
+#
+#     # Convert list of images to a single 3D numpy array (matrix)
+#     x_test = np.array(images)
+#
+#     # print(x_test.shape)
+#     y_test = np.array([label] * len(x_test))
+#     return x_test, y_test, image_files
+
+def load_mnist_test(popsize, number):
+    file_test_x = 'original_dataset/mnist/t10k-images-idx3-ubyte.gz'
+    file_test_y = 'original_dataset/mnist/t10k-labels-idx1-ubyte.gz'
+
+    with gzip.open(file_test_x, 'rb') as f:
+        _ = np.frombuffer(f.read(16), dtype=np.uint8, count=4)
+        images = np.frombuffer(f.read(), dtype=np.uint8)
+        test_x = images.reshape(-1, 28, 28)
+
+    with gzip.open(file_test_y, 'rb') as f:
+        _ = np.frombuffer(f.read(8), dtype=np.uint8, count=2)
+        labels = np.frombuffer(f.read(), dtype=np.uint8)
+        test_y = labels
+
+    idx = [i for i, label in enumerate(test_y) if label == number]
+    #print(f"number of {number} is {len(idx)}")
+    filtered_test_y = test_y[idx]
+    filtered_test_x = test_x[idx]
+
+    if popsize < filtered_test_y.shape[0]:
+        select_index = np.random.choice(range(filtered_test_x.shape[0]), size=popsize, replace=False)
+        select_index = np.sort(select_index)
+        # print(f"select index {select_index}")
+        return filtered_test_x[select_index], filtered_test_y[select_index]
     else:
-        dataset_path = os.path.join("original_dataset/final-mnist/not_100/", str(label))
-    # List all files in the directory
-    image_files = glob.glob(dataset_path + '/*.png')
-    image_files = sorted(image_files, key=lambda x: int(x.split('/')[-1].split('.')[0]))
-    # Initialize an empty list to store the images
-    images = []
+        return filtered_test_x, filtered_test_y
 
-    # Load each image and append to the list
-    for image_path in image_files:
-        # Load image in grayscale mode
-        img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-        if img is not None:
-            images.append(img)
+def load_fmnist_test(popsize, number):
+    file_test_x = 'original_dataset/fashion/t10k-images-idx3-ubyte.gz'
+    file_test_y = 'original_dataset/fashion/t10k-labels-idx1-ubyte.gz'
 
-    # Convert list of images to a single 3D numpy array (matrix)
-    x_test = np.array(images)
+    with gzip.open(file_test_x, 'rb') as f:
+        _ = np.frombuffer(f.read(16), dtype=np.uint8, count=4)
+        images = np.frombuffer(f.read(), dtype=np.uint8)
+        test_x = images.reshape(-1, 28, 28)
 
-    # print(x_test.shape)
-    y_test = np.array([label] * len(x_test))
-    return x_test, y_test, image_files
+    with gzip.open(file_test_y, 'rb') as f:
+        _ = np.frombuffer(f.read(8), dtype=np.uint8, count=2)
+        labels = np.frombuffer(f.read(), dtype=np.uint8)
+        test_y = labels
 
+    idx = [i for i, label in enumerate(test_y) if label == number]
+    #print(f"number of {number} is {len(idx)}")
+    filtered_test_y = test_y[idx]
+    filtered_test_x = test_x[idx]
 
+    if popsize < filtered_test_y.shape[0]:
+        select_index = np.random.choice(range(filtered_test_x.shape[0]), size=popsize, replace=False)
+        select_index = np.sort(select_index)
+        # print(f"select index {select_index}")
+        return filtered_test_x[select_index], filtered_test_y[select_index]
+    else:
+        return filtered_test_x, filtered_test_y
 
 def check_label(x_test, y_test, image_files, explabel):
     predictions, _ = (Predictor.predict(img=x_test, label=y_test))
@@ -169,3 +222,18 @@ def check_label(x_test, y_test, image_files, explabel):
     assert x_test.shape[0] != 0, "No data left"
 
     return x_test, y_test, image_files
+
+def closest_2d_point(target_point, points_list):
+    # Convert the points list to a NumPy array for easier computation
+    points_array = np.array(points_list)
+
+    # Calculate the Euclidean distance between the target point and all points in the list
+    distances = np.linalg.norm(points_array - target_point, axis=1)
+
+    # Find the index of the point with the minimum distance
+    closest_index = np.argmin(distances)
+
+    # Retrieve the closest point
+    closest_point = points_list[closest_index]
+
+    return closest_point

@@ -3,51 +3,6 @@ DJ_DEBUG = 1
 # GA Setup
 POPSIZE = 200
 
-STOP_CONDITION = "iter"
-# STOP_CONDITION = "time"
-
-NGEN = 100
-RUNTIME = 3600
-STEPSIZE = 10
-
-# Ground Truth Number
-NUMBER = 5
-
-# Attention map method
-ATTENTION = "SmoothGrad"
-# "SmoothGrad"|"VanillaSaliency"|# "GradCAM"|"GradCAM++"|"ScoreCAM"|"Faster-ScoreCAM"|"IntegratedGradients"
-# "SmoothGrad"|"GradCAM++"|"Faster-ScoreCAM"|"IntegratedGradients"
-
-# Control point selection methods
-CONTROL_POINT = "clustering"   # |"random"|"square-window"|"clustering"
-# Mutation Hyperparameters
-MUTATION_TYPE = "toward_centroid"  # |"random"|"random_cycle"|"toward_centroid"|"backward_centroid"|"centroid_based"
-
-# Max mutation retry times
-MAX_ATTEMPT = 15
-
-# range of the mutation
-MUTLOWERBOUND = 0.01
-MUTUPPERBOUND = 0.6
-MUTEXTENT = 2
-# Reseeding Hyperparameters
-# extent of the reseeding operator
-RESEEDUPPERBOUND = 10
-
-
-# K-nearest
-K = 1
-
-# Mutation Recording
-MUTATION_RECORD = True
-
-# ------- NOT TUNING ----------
-
-# mutation operator probability
-MUTOPPROB = 0.5
-MUTOFPROB = 0.5
-
-IMG_SIZE = 28
 num_classes = 10
 
 INITIALPOP = 'seeded'

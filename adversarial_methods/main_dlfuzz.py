@@ -11,8 +11,7 @@ from tensorflow.keras import backend as K
 # from tensorflow import keras
 from adversarial_methods.DLFuzz.dlfuzz import DLFuzz
 from adversarial_methods.DLFuzz.utils import clear_up_dir, deprocess_image
-from population import load_mnist_test
-from utils import set_all_seeds
+from utils import set_all_seeds, load_mnist_test
 from config import POPSIZE
 from predictor import Predictor
 import csv

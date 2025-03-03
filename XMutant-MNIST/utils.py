@@ -90,7 +90,6 @@ def set_all_seeds(digit):
     np.random.seed(SEEDS_LIST_FOR_REPETITIONS_OF_MUTATIONS[digit])
     tf.keras.utils.set_random_seed(SEEDS_LIST_FOR_REPETITIONS_OF_MUTATIONS[digit])
 
-
 def closest_2d_point(target_point, points_list):
     # Convert the points list to a NumPy array for easier computation
     points_array = np.array(points_list)

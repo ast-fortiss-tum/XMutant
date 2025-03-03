@@ -47,7 +47,7 @@ def reconstruction_probability(dec, z_mean, z_log_var, X):
     return reconstruction_loss
 
 
-# Calculates and returns probability density of test input
+# Calculates and returns probability density of vit_model input
 def calculate_density(x_target_orig, enc, dec):
     x_target_orig = np.clip(x_target_orig, 0, 1)
     x_target = np.reshape(x_target_orig, (-1, 28 * 28))
@@ -109,7 +109,7 @@ def main():
         count_ids = 0
         if len(filelist) != 0:
             for sample in filelist:
-                # TODO: correct the input images to drop the white frame, a reshape only is not a fix
+                # TODO: correct the input vit_model to drop the white frame, a reshape only is not a fix
                 s = np.load(sample)#.reshape(28, 28, 1)
                 # plt.figure()
                 # plt.imshow(s, cmap='gray')
@@ -192,7 +192,6 @@ def check_validity_rate_over_iteration(record_name, digit=None):
                 df_cumulative_validity["ID_num"+"_"+confidence]/df_cumulative_validity["pop_num"]
         ).round(decimals=3)
 
-    
     df_cumulative_validity.to_csv(os.path.join(RESULTS_PATH, "cumulative_clear_validity_rate_" + record_name.split("/")[-1]))
 
 
@@ -200,7 +199,7 @@ if __name__ == "__main__":
     '''
     Usage: place the MNIST digits for validation in the folder 'mnist/selforacle/generated_images/mnist_inputs/mnist_xm',
      either in npy or png format (other formats are currently not supported). 
-    Then run the main function to calculate the reconstruction probability of the images and classify them as ID or OOD.
+    Then run the main function to calculate the reconstruction probability of the vit_model and classify them as ID or OOD.
     The results are stored in a csv file 'ood_analysis_xmutant_all_classes.csv' within the 'mnist/selforacle/losses' folder.
     A different threshold value can be selected looking at the selforacle_thresholds_all_classes.json file.
     '''
