@@ -1,8 +1,0 @@
-Before drop the 0 episode cases
-
-statistic is: 245.5 P-Value is: 3.1212883747910476e-05
-Cohen's D is: ('medium', 0.649883188874516)
-statistic is: 245.5 P-Value is: 3.1212883747910476e-05
-Cohen's D is: ('medium', 0.649883188874516)
-
-

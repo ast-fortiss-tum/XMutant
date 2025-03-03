@@ -1,5 +1,0 @@
-population size,total iteration number,attention method,misbehaviour number,misbehaviour Percentage,seed
-174,100,Random,56,32.18%,44
-174,100,SmoothGrad,95,54.60%,44
-174,100,IntegratedGradients,133,76.44%,44
-174,100,Lime,132,75.86%,44
