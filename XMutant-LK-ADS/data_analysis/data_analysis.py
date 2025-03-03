@@ -327,7 +327,7 @@ def walk_folder_dqd_simple(timestamp=None,
 
 def dqd_plot(dqd_path="results/summary_increment.csv",
              save_img: bool = False,
-             img_path: bool = "result/images/"):
+             img_path: bool = "result/vit_model/"):
     df_dqd = pd.read_csv(dqd_path)
     df_dqd["method combi"] = df_dqd["mutation type"].values + " " + df_dqd["mutation method"].values
     print(df_dqd["method combi"].unique())
@@ -354,7 +354,7 @@ def dqd_plot(dqd_path="results/summary_increment.csv",
 
 def dqd_stat_simple(dqd_path="results/summary_increment.csv",
              save_img: bool = False,
-             img_path: bool = "result/images/"):
+             img_path: bool = "result/vit_model/"):
     df_dqd = pd.read_csv(dqd_path)
     # print(df_dqd["method combi"].unique())
     sns.set_theme(style="whitegrid")

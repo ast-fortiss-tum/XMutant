@@ -24,8 +24,8 @@ def main(num=NUMBER, popsize=POPSIZE, xai_method=ATTENTION, enable_timer: bool =
     print(f" Population size {pop.size}")
 
     # Collect data
-    field_names = ["id", "misclass ", "predicted label"]
-    data = []
+    # field_names = ["id", "misclass ", "predicted label"]
+    # data = []
 
     condition = True
     gen = 1
@@ -50,7 +50,7 @@ def main(num=NUMBER, popsize=POPSIZE, xai_method=ATTENTION, enable_timer: bool =
             condition = False
     if len(pop.population_to_mutate) > 0:
         pop.evaluate_population(gen, folder)
-        confidences = [ind.confidence for ind in pop.population_to_mutate]
+        # confidences = [ind.confidence for ind in pop.population_to_mutate]
         """print('Iteration:{:4}, Mis-number:{:3}, Pop-number:{:3}, avg:{:1.10f}, min:{:2.4f}, max:{:1.4f}'
               .format(*[gen, pop.misclass_number, len(confidences), np.mean(confidences),
                         np.min(confidences), np.max(confidences), ]))"""
@@ -71,19 +71,19 @@ def main(num=NUMBER, popsize=POPSIZE, xai_method=ATTENTION, enable_timer: bool =
 
 
 if __name__ == "__main__":
-    """digit = 0
+    digit = 0
     set_all_seeds(digit)
-    main(num=digit, popsize=200)"""
+    main(num=digit, popsize=200)
 
     """for xai_method in ["SmoothGrad", "GradCAM++", "Faster-ScoreCAM", "IntegratedGradients"]:
         for digit in range(0, 2):# range(10):
             set_all_seeds(digit)
             main(num=digit, popsize=POPSIZE, xai_method=xai_method)"""
-    
-    # random test
-    for digit in range(10): # range(10):
-        set_all_seeds(digit)
-        main(num=digit, popsize=1, xai_method="SmoothGrad", enable_timer=True)
+
+    # # random vit_model
+    # for digit in range(10): # range(10):
+    #     set_all_seeds(digit)
+    #     main(num=digit, popsize=POPSIZE, xai_method="SELF", enable_timer=True)
 
     # for xai_method in ["SmoothGrad", "GradCAM++", "Faster-ScoreCAM", "IntegratedGradients"]:
     #     for digit in range(10):

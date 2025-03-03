@@ -1,5 +1,5 @@
-from utils import set_all_seeds
-from population import load_mnist_test
+from utils import set_all_seeds, load_mnist_test
+
 from config import POPSIZE
 from predictor import Predictor
 import os
@@ -41,7 +41,10 @@ def main():
             succeed, result = generate_one_example(image, image_label,model)
             if succeed:
                 # save image
-                img_name = os.path.join(img_dir, f"digit_{digit}", f"id_{i}.png")
+                save_path = os.path.join(img_dir, f"digit_{digit}")
+                os.makedirs(save_path, exist_ok=True)
+                img_name = os.path.join(save_path, f"id_{i}.png")
+
                 img_array = result['adv_x'].numpy().reshape(28,28)
                 img = Image.fromarray(np.uint8(img_array*255))
                 img.save(img_name)

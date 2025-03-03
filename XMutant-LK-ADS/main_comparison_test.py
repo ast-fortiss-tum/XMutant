@@ -62,7 +62,7 @@ def perform_one_test(seed: int = 0,
                      mutation_type: str = args.mutation_type,
                      mutation_method: str = args.mutation_method) -> bool:
     """
-    perform one test with one plus one generator, where the control point selection is either XAI guided or random.
+    perform one vit_model with one plus one generator, where the control point selection is either XAI guided or random.
     Params:
         mutation_type: str = "XAI" or "RANDOM"
         mutation_method: = 'random', 'attention_same', 'attention_opposite'
@@ -72,7 +72,7 @@ def perform_one_test(seed: int = 0,
     logger = GlobalLog("main")
     run_path = os.path.join(time_start + '-' + mutation_type + '-seed=' + str(seed))
 
-    # 1 plus 1 test generator
+    # 1 plus 1 vit_model generator
     test_generator = OnePlusOneTestGenerator(map_size=250, num_control_nodes=args.num_control_nodes)
 
     env = UdacityGymEnv(
@@ -327,7 +327,7 @@ def main(number_of_test=1):
 
         # set seed out of the loop
         print(f"Test IDX {i} seed {args.seed + i} start")
-        print(f"--------------{args.mutation_type} test generation--------------")
+        print(f"--------------{args.mutation_type} vit_model generation--------------")
         seed_ = args.seed + i
         set_random_seed(seed=seed_)
         result = perform_one_test(seed=seed_, mutation_type=args.mutation_type, mutation_method=args.mutation_method)

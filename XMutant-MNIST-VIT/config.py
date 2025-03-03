@@ -1,3 +1,4 @@
+
 DJ_DEBUG = 1
 
 # GA Setup
@@ -14,14 +15,13 @@ STEPSIZE = 10
 NUMBER = 5
 
 # Attention map method
-ATTENTION = "SmoothGrad"
-# "SmoothGrad"|"VanillaSaliency"|# "GradCAM"|"GradCAM++"|"ScoreCAM"|"Faster-ScoreCAM"|"IntegratedGradients"
+ATTENTION = "SELF"
 # "SmoothGrad"|"GradCAM++"|"Faster-ScoreCAM"|"IntegratedGradients"
 
 # Control point selection methods
-CONTROL_POINT = "clustering"   # |"random"|"square-window"|"clustering"
+CONTROL_POINT = "random"   # |"random"|"square-window"|"clustering"
 # Mutation Hyperparameters
-MUTATION_TYPE = "toward_centroid"  # |"random"|"random_cycle"|"toward_centroid"|"backward_centroid"|"centroid_based"
+MUTATION_TYPE = "random_cycle"  # |"random"|"random_cycle"|"toward_centroid"|"backward_centroid"|"centroid_based"
 
 # Max mutation retry times
 MAX_ATTEMPT = 15
@@ -54,14 +54,39 @@ INITIALPOP = 'seeded'
 
 GENERATE_ONE_ONLY = False
 
-MODEL = 'models/cnnClassifier.h5'
-# MODEL = 'models/cnn-classifier-low.h5'
+
+# VIT_MODEL_CONFIGS = {
+#     'image_size': 32,
+#     'channel_size': 1,
+#     'patch_size': 4,
+#     'embed_size': 512,
+#     'num_heads': 8,
+#     'classes': 10,
+#     'num_layers': 3,
+#     'hidden_size': 256,
+#     'dropout': 0.2,
+#     'checkpoint_path': 'transformer_model/checkpoints/epoch_23_val_acc_98.67.pth'
+# }
+
+VIT_MODEL_CONFIGS = {
+    'image_size': 28,
+    'embed_dim': 256,
+    'num_heads': 8,
+    'num_layers': 6,
+    'patch_size': 4,
+    'num_channels': 1,
+    'num_classes': 10,
+    'dropout': 0.2,
+    'checkpoint_path': 'vit_model/checkpoints/4_49_patches_epoch_24_val_acc_97.53.pth',
+    'normalization': True
+}
+VIT_MODEL_CONFIGS['hidden_dim'] = VIT_MODEL_CONFIGS['embed_dim'] * 3
+VIT_MODEL_CONFIGS['num_patches'] = (VIT_MODEL_CONFIGS['image_size'] // VIT_MODEL_CONFIGS['patch_size']) ** 2
+BATCH_SIZE = 64
 
 RESULTS_PATH = 'results'
 REPORT_NAME = 'stats.csv'
 DATASET = 'original_dataset/janus_dataset_comparison.h5'
-
-
 
 SAVE_IMAGES = True
 START_INDEX_DATASET = 0

@@ -10,7 +10,7 @@ from config import (DATASET, POPSIZE, CONTROL_POINT, REPORT_NAME, MUTEXTENT, MUT
                     ATTENTION, MUTATION_TYPE, MAX_ATTEMPT)
 from individual import Individual
 import vectorization_tools
-from attention_manager import AttentionManager
+# from attention_manager import AttentionManager
 from predictor import Predictor
 from digit_mutator import DigitMutator
 import time
@@ -77,7 +77,7 @@ class Population:
         self.xai_method = xai_method
         if CONTROL_POINT == "random":
             self.xai_method = "none"
-        self.attention = AttentionManager(num=self.digit, attention_method=self.xai_method)
+        self.predictor = Predictor()
 
         self.enable_timer = enable_timer
         if self.enable_timer:
@@ -108,18 +108,17 @@ class Population:
         batch_individual = np.reshape(batch_individual, (-1, 28, 28, 1))
         batch_label = ([ind.expected_label for ind in self.population_to_mutate])
 
+        predictions, confidences = (self.predictor.predict(batch_individual))
+
         if CONTROL_POINT != "random":
             if self.enable_timer:
                 start_hm = time.time()
-            attmaps = self.attention.compute_attention_maps(batch_individual)
+            attmaps = self.predictor.attention_rollout(batch_individual)
             attmaps = np.reshape(attmaps, (-1, 28, 28))
             if self.enable_timer:
                 self.elapsed_time["heatmap_time"] += time.time() - start_hm
         else:
             attmaps = [None] * len(batch_individual)
-
-        predictions, confidences = (Predictor.predict(img=batch_individual,
-                                                      label=batch_label))
         # label result and detect misclass
         for ind, prediction, confidence, attmap \
                 in zip(self.population_to_mutate, predictions, confidences, attmaps):
@@ -164,9 +163,9 @@ class Population:
                     mutator.mutate()
                     break
                 except Exception:
-                    print(f"Retry mutation, attempts {attempt}.")
+                    #print(f"Retry mutation, attempts {attempt}.")
                     if attempt >= MAX_ATTEMPT:
-                        print(f"Mutation failed!")
+                        print(f"Mutation failed for individual {ind.id}")
                         #sys.exit()
                         ind.fail = True
                         break
@@ -239,7 +238,12 @@ class Population:
                            'stride extent',
                            'misbehaviour number',
                            'misbehaviour Percentage']
+
+                if self.enable_timer:
+                    headers.extend(self.elapsed_time.keys())
                 writer.writerow(headers)
+                if self.enable_timer:
+                    data.extend(self.elapsed_time.values())
                 writer.writerow(data)
         else:
             # only write data when csv is already existed
@@ -251,7 +255,7 @@ class Population:
 if __name__ == "__main__":
     from utils import get_distance
     from folder import Folder
-
+    fo = Folder(num= 5, xai_method=ATTENTION)
     pop_size = 3
 
     pop = Population(number=5, pop_size=pop_size)
@@ -259,7 +263,7 @@ if __name__ == "__main__":
     # pop.evaluate_population(0)
 
     for idx in range(2):
-        pop.evaluate_population(idx, Folder)
+        pop.evaluate_population(idx, fo)
         # print([ind.confidence for ind in pop.population_to_mutate])
         pop.mutate()
 

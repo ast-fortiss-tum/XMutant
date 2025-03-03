@@ -44,14 +44,14 @@ def score_when_decrease(output):
 def compute_heatmap(simulation_name: str, attention_type: str = "SmoothGrad"):
     logger.debug("Computing attention heatmaps for simulation %s using %s" % (simulation_name, attention_type))
 
-    # load images paths from filesystem
+    # load vit_model paths from filesystem
     image_names_list = natsorted(glob(os.path.join(os.getcwd(), simulation_name, '*.jpg')))
     image_list = list(map(Image.open, natsorted(glob(os.path.join(os.getcwd(), simulation_name, '*.jpg')))))
 
     assert len(image_names_list) != 0
     assert len(image_list) != 0
 
-    logger.debug("read %d images from file" % len(image_list))
+    logger.debug("read %d vit_model from file" % len(image_list))
 
     index_step = 10
     image_names_list = image_names_list[::index_step]

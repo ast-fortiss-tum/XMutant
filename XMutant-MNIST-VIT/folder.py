@@ -22,7 +22,7 @@ class Folder:
         elif MUTATION_TYPE in ["toward_centroid", "backward_centroid", "centroid_based"]:
             file_name = file_name + "_C"
 
-        if xai_method == "SmoothGrad":
+        if xai_method == "Rollout":
             file_name = file_name + "_sm"
         elif xai_method == "GradCAM++":
             file_name = file_name + "_GC"
@@ -39,8 +39,8 @@ class Folder:
             self.mutation_logs_folder = self.DST + "/individual_logs"
             if not exists(self.mutation_logs_folder):
                 makedirs(self.mutation_logs_folder)
-                self.mutation_logdata_folder = self.mutation_logs_folder+"/data"
-                if not exists(self.mutation_logdata_folder):
-                    makedirs(self.mutation_logdata_folder)
+            self.mutation_logdata_folder = self.mutation_logs_folder+"/data"
+            if not exists(self.mutation_logdata_folder):
+                makedirs(self.mutation_logdata_folder)
         self.DST_ARC = join(self.DST, "archive")
         self.DST_IND = join(self.DST, "inds")

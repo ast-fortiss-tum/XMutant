@@ -46,7 +46,7 @@ class Predictor:
         explabel = np.argmax(explabel.squeeze())
 
         # Predictions vector
-        predictions = Predictor.model.predict(img)
+        predictions = Predictor.model.predict(img, verbose=0)
 
         prediction1, prediction2 = np.argsort(-predictions[0])[:2]
 

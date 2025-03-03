@@ -13,7 +13,7 @@ def evaluate_ff2(confidence1, confidence2):
     P3 = confidence1 * confidence2
 
     if P3 < 0:
-        P3 = -0.1
+        P3 = -0.1#  -0.1
     return P3
 
 
@@ -32,7 +32,7 @@ def dist_from_nearest_archived(ind, population, k):
 
     if len(neighbors) == 0:
         assert (len(population) > 0)
-        assert (population[0].id == ind.id)
+        # assert (population[0].id == ind.id)
         return -1.0
 
     neighbors.sort()

@@ -8,8 +8,9 @@ from utils import get_distance
 from evaluator import eval_archive_dist
 import numpy as np
 
-from config import ARCHIVE_THRESHOLD, POPSIZE, NGEN, MUTLOWERBOUND, MUTUPPERBOUND, \
-    RESEEDUPPERBOUND, K_SD, MODEL, EXPLABEL, STOP_CONDITION, RUNTIME, REPORT_NAME, STEPSIZE
+from config import (ARCHIVE_THRESHOLD, POPSIZE, NGEN, MUTLOWERBOUND, MUTUPPERBOUND, RESEEDUPPERBOUND,
+                    K_SD, MODEL, EXPLABEL, STOP_CONDITION, RUNTIME, REPORT_NAME, STEPSIZE, SEED,
+                    XMUTANT_CONFIG)
 from metrics import get_diameter, get_radius_reference
 
 
@@ -160,6 +161,10 @@ class Archive:
             'reseed': str(RESEEDUPPERBOUND),
             'K': str(K_SD),
             'model': str(MODEL),
+            'seed': str(SEED),
+            'xmutant_xai': XMUTANT_CONFIG['xai'],
+            'xmutant_selection': XMUTANT_CONFIG['selection'],
+            'xmutant_direction': XMUTANT_CONFIG['direction']
         }
 
         dst = join(Folder.DST, "config.json")

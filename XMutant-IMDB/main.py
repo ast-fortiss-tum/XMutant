@@ -12,7 +12,7 @@ from folder import Folder
 from utils import set_all_seeds
 
 # import tensorflow as tf
-# print(tf.test.is_gpu_available())
+# print(tf.vit_model.is_gpu_available())
 # import os
 # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
@@ -61,7 +61,7 @@ def main(popsize=POPSIZE, xai_method=XAI_METHOD):
 if __name__ == "__main__":
     main(popsize=3)
     
-    # random test
+    # random vit_model
     # for digit in range(10): # range(10):
     #     set_all_seeds(digit)
     #     main(num=digit, popsize=1, xai_method="SmoothGrad", enable_timer=True)

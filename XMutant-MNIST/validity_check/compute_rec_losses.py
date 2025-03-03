@@ -34,7 +34,7 @@ def reconstruction_probability(dec, z_mean, z_log_var, X):
     return reconstruction_loss
 
 
-# Calculates and returns probability density of test input
+# Calculates and returns probability density of vit_model input
 def calculate_density(x_target_orig, enc, dec):
     x_target_orig = np.clip(x_target_orig, 0, 1)
     x_target = np.reshape(x_target_orig, (-1, 28*28))
