@@ -2,7 +2,7 @@
 
 ## General Information ##
 This repository contains the tools and the data of the paper "XMutant: XAI-based Fuzzing for Deep Learning Systems"
- by XXX
+
 
 ## Repository Structure ##
 The package is structured as follows:
@@ -20,7 +20,5 @@ XXX
 ## License ##
 The software we developed is distributed under MIT license. See the [license](/LICENSE) file.
 
-## Contacts
 
-For any related question, please contact XXX ([xxx@xxx](xxx@xxx)) 
 
