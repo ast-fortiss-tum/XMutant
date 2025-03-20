@@ -13,12 +13,24 @@ The package is structured as follows:
 
 _Note:_ each sub-package contains further specific instructions.
 
-## Reference
+## Citation
 
-XXX
+A preprint of the paper can be found on [arXiv](https://arxiv.org/abs/2503.07222).
+
+If you use our work in your research, or it helps it, or if you simply like it, please cite it in your publications. 
+Here is an example BibTeX entry:
+
+```
+@misc{2025-Chen-arxiv,
+	title        = {{XMutant: XAI-based Fuzzing for Deep Learning Systems}},
+	author       = {Xingcheng Chen and Matteo Biagiola and Vincenzo Riccio and Marcelo d'Amorim and Andrea Stocco},
+	year         = {2025},
+	eprint       = {2503.07222},
+	archivePrefix = {arXiv},
+	primaryClass = {cs.SE},
+	url          = {https://arxiv.org/abs/2503.07222}
+}
+```
 
 ## License ##
 The software we developed is distributed under MIT license. See the [license](/LICENSE) file.
-
-
-
