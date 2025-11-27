@@ -21,13 +21,12 @@ If you use our work in your research, or it helps it, or if you simply like it, 
 Here is an example BibTeX entry:
 
 ```
-@misc{2025-Chen-arxiv,
+@article{2025-Chen-EMSE,
 	title        = {{XMutant: XAI-based Fuzzing for Deep Learning Systems}},
 	author       = {Xingcheng Chen and Matteo Biagiola and Vincenzo Riccio and Marcelo d'Amorim and Andrea Stocco},
-	year         = {2025},
-	eprint       = {2503.07222},
-	archivePrefix = {arXiv},
-	primaryClass = {cs.SE},
+	year         = 2025,
+	journal      = {Empirical Software Engineering},
+	publisher    = {Springer},
 	url          = {https://arxiv.org/abs/2503.07222}
 }
 ```
