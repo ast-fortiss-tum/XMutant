@@ -1,6 +1,6 @@
-'''
+"""
 LeNet-1
-'''
+"""
 
 # usage: python MNISTModel1.py - train the model
 
@@ -17,8 +17,8 @@ import numpy as np
 
 def load_data(path="MNIST_data/mnist.npz"):
     f = np.load(path)
-    x_train, y_train = f['x_train'], f['y_train']
-    x_test, y_test = f['x_test'], f['y_test']
+    x_train, y_train = f["x_train"], f["y_train"]
+    x_test, y_test = f["x_test"], f["y_test"]
     f.close()
     return (x_train, y_train), (x_test, y_test)
 
@@ -44,8 +44,8 @@ def Model1(input_tensor=None, train=False):
         x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
         input_shape = (img_rows, img_cols, 1)
 
-        x_train = x_train.astype('float32')
-        x_test = x_test.astype('float32')
+        x_train = x_train.astype("float32")
+        x_test = x_test.astype("float32")
         x_train /= 255
         x_test /= 255
 
@@ -55,46 +55,55 @@ def Model1(input_tensor=None, train=False):
 
         input_tensor = Input(shape=input_shape)
     elif input_tensor is None:
-        print('you have to proved input_tensor when testing')
+        print("you have to proved input_tensor when testing")
         exit()
 
     # block1
     # print("in Model1 input_tensor = ",input_tensor)
-    x = Convolution2D(4, kernel_size, activation='relu', padding='same', name='block1_conv1')(input_tensor)
+    x = Convolution2D(4, kernel_size, activation="relu", padding="same", name="block1_conv1")(
+        input_tensor
+    )
     # print("in Model1 x = ", x)
-    x = MaxPooling2D(pool_size=(2, 2), name='block1_pool1')(x)
+    x = MaxPooling2D(pool_size=(2, 2), name="block1_pool1")(x)
 
     # block2
-    x = Convolution2D(12, kernel_size, activation='relu', padding='same', name='block2_conv1')(x)
-    x = MaxPooling2D(pool_size=(2, 2), name='block2_pool1')(x)
+    x = Convolution2D(12, kernel_size, activation="relu", padding="same", name="block2_conv1")(x)
+    x = MaxPooling2D(pool_size=(2, 2), name="block2_pool1")(x)
 
-    x = Flatten(name='flatten')(x)
+    x = Flatten(name="flatten")(x)
 
-    x = Dense(nb_classes, name='before_softmax')(x)
-    x = Activation('softmax', name='predictions')(x)
+    x = Dense(nb_classes, name="before_softmax")(x)
+    x = Activation("softmax", name="predictions")(x)
 
     model = Model(input_tensor, x)
 
     if train:
         # compiling
-        model.compile(loss='categorical_crossentropy', optimizer='adadelta', metrics=['accuracy'])
+        model.compile(loss="categorical_crossentropy", optimizer="adadelta", metrics=["accuracy"])
 
         # trainig
-        model.fit(x_train, y_train, validation_data=(x_test, y_test), batch_size=batch_size, epochs=nb_epoch, verbose=1)
+        model.fit(
+            x_train,
+            y_train,
+            validation_data=(x_test, y_test),
+            batch_size=batch_size,
+            epochs=nb_epoch,
+            verbose=1,
+        )
         # save model
-        model.save_weights('./Model1.h5')
+        model.save_weights("./Model1.h5")
         score = model.evaluate(x_test, y_test, verbose=0)
-        print('\n')
-        print('Overall Test score:', score[0])
-        print('Overall Test accuracy:', score[1])
+        print("\n")
+        print("Overall Test score:", score[0])
+        print("Overall Test accuracy:", score[1])
     else:
-        model.load_weights('./Model1.h5')
-        print('Model1 loaded')
+        model.load_weights("./Model1.h5")
+        print("Model1 loaded")
 
     # K.clear_session()
 
     return model
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     Model1(train=True)

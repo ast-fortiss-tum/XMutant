@@ -1,14 +1,13 @@
+import json
+from os import makedirs
+from os.path import exists, join
+
 import matplotlib.pyplot as plt
 import numpy as np
-import json
-from os.path import join, exists
-from os import makedirs
-
-from folder import Folder
-import rasterization_tools
-from digit_mutator import DigitMutator
-from config import MUTATION_RECORD
 import pandas as pd
+import rasterization_tools
+from config import MUTATION_RECORD
+from folder import Folder
 
 
 class Individual:
@@ -32,8 +31,15 @@ class Individual:
 
         self.fail = False
         if MUTATION_RECORD:
-            self.mutation_log = pd.DataFrame(columns=["mutation_id", "file",
-                                                      "confidence", "mutation_point_x", "mutation_point_y"])
+            self.mutation_log = pd.DataFrame(
+                columns=[
+                    "mutation_id",
+                    "file",
+                    "confidence",
+                    "mutation_point_x",
+                    "mutation_point_y",
+                ]
+            )
 
         self.rel_intensity_after = 0
         self.rel_intensity_before = 0
@@ -46,57 +52,59 @@ class Individual:
         self.attention = None
 
     def to_dict(self, ind_id):
-        return {'id': str(self.id),
-                'sol_id': str(ind_id),
-                'expected_label': str(self.expected_label),
-                'predicted_label': str(self.predicted_label),
-                'misbehaviour': str(not self.misclass),
-                'confidence': str(self.confidence),
-                # 'timestamp': str(self.timestamp),
-                # 'elapsed': str(self.elapsed_time),
-                }
+        return {
+            "id": str(self.id),
+            "sol_id": str(ind_id),
+            "expected_label": str(self.expected_label),
+            "predicted_label": str(self.predicted_label),
+            "misbehaviour": str(not self.misclass),
+            "confidence": str(self.confidence),
+            # 'timestamp': str(self.timestamp),
+            # 'elapsed': str(self.elapsed_time),
+        }
 
     def save_png(self, filename):
-        plt.imsave(filename + '.png', self.purified.reshape(28, 28), cmap='gray', format='png')
+        plt.imsave(filename + ".png", self.purified.reshape(28, 28), cmap="gray", format="png")
 
     def dump(self, filename, ind_id):
         data = self.to_dict(ind_id)
         filedest = filename + ".json"
-        with open(filedest, 'w') as f:
+        with open(filedest, "w") as f:
             (json.dump(data, f, sort_keys=True, indent=4))
 
     def save_npy(self, filename):
         np.save(filename, self.purified)
-        test_img = np.load(filename + '.npy')
+        test_img = np.load(filename + ".npy")
         diff = self.purified - test_img
-        assert (np.linalg.norm(diff) == 0)
+        assert np.linalg.norm(diff) == 0
 
     def save_svg(self, filename):
         data = self.xml_desc
         filedest = filename + ".svg"
-        with open(filedest, 'w') as f:
+        with open(filedest, "w") as f:
             f.write(data)
 
     def append_mutation_log(self, gen_number, folder):
         # here assume MUTATION_RECORD is True
         # print(self.purified)
-        dst = folder.mutation_logdata_folder+'/ID'+str(self.id)
+        dst = folder.mutation_logdata_folder + "/ID" + str(self.id)
         if not exists(dst):
             makedirs(dst)
 
-        file_dst = dst + '/GEN'+str(gen_number)+'.npy'
+        file_dst = dst + "/GEN" + str(gen_number) + ".npy"
 
-        with open(file_dst, 'wb') as f:
+        with open(file_dst, "wb") as f:
             np.save(f, self.purified)
             np.save(f, self.attention)
-        data_to_append = {"mutation_id": gen_number,
-                          "file": file_dst,
-                          "confidence": self.confidence,
-                          "mutation_point_x": self.mutation_point[0],
-                          "mutation_point_y": self.mutation_point[1],
-                          "rel_intensity_before": self.rel_intensity_before,
-                          "rel_intensity_after" : self.rel_intensity_after
-                          }
+        data_to_append = {
+            "mutation_id": gen_number,
+            "file": file_dst,
+            "confidence": self.confidence,
+            "mutation_point_x": self.mutation_point[0],
+            "mutation_point_y": self.mutation_point[1],
+            "rel_intensity_before": self.rel_intensity_before,
+            "rel_intensity_after": self.rel_intensity_after,
+        }
 
         # print(data_to_append)
         df_temp = pd.DataFrame([data_to_append])
@@ -104,7 +112,7 @@ class Individual:
         self.mutation_log = mutation_log
 
     def save_mutation_log(self, folder):
-        self.mutation_log.to_csv(folder.mutation_logs_folder + '/' + str(self.id) + ".csv")
+        self.mutation_log.to_csv(folder.mutation_logs_folder + "/" + str(self.id) + ".csv")
 
     def export(self, ind_id):
         if not exists(Folder.DST_ARC):

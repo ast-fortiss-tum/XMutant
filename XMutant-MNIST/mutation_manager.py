@@ -1,17 +1,17 @@
+import os
 import random
+
 # import xml.etree.ElementTree as ET
 import re
+from random import uniform
+
 import numpy as np
-from random import randint, uniform
-from config import MUTLOWERBOUND, MUTUPPERBOUND, \
-    MUTOFPROB, MUTATION_TYPE, MUTEXTENT
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+from config import MUTATION_TYPE, MUTEXTENT, MUTLOWERBOUND, MUTOFPROB, MUTUPPERBOUND
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 
-
-
-NAMESPACE = '{http://www.w3.org/2000/svg}'
+NAMESPACE = "{http://www.w3.org/2000/svg}"
 
 
 def apply_displacement_to_mutant(value, extent):
@@ -33,8 +33,9 @@ def mutate_one_point(point, direction=None):
         original_coordinate = random.choice(point)
         # + or - a random number uniformly distributed in [0.01, 0.6] to the coordinate.
         mutated_coordinate = apply_displacement_to_mutant(original_coordinate, MUTEXTENT)
-        mutated_coordinates_str = original_coordinates_str.replace(str(original_coordinate),
-                                                                   str(mutated_coordinate))
+        mutated_coordinates_str = original_coordinates_str.replace(
+            str(original_coordinate), str(mutated_coordinate)
+        )
         return original_coordinates_str, mutated_coordinates_str, mutated_coordinate
     elif MUTATION_TYPE == "random_cycle":
         length = uniform(MUTLOWERBOUND, MUTUPPERBOUND) * MUTEXTENT
@@ -46,10 +47,10 @@ def mutate_one_point(point, direction=None):
         mutated_coordinates_str = str(x_mutant) + "," + str(y_mutant)
         return original_coordinates_str, mutated_coordinates_str, (x_mutant, y_mutant)
     elif MUTATION_TYPE == "toward_centroid" or "backward_centroid" or "centroid_based":
-        #assert direction[0] is float
-        #assert direction[1] is float
+        # assert direction[0] is float
+        # assert direction[1] is float
         assert direction is not None
-        #print(direction)
+        # print(direction)
         length = uniform(MUTLOWERBOUND, MUTUPPERBOUND) * MUTEXTENT
         if MUTATION_TYPE == "toward_centroid":
             dx = length * direction[0]
@@ -69,6 +70,7 @@ def mutate_one_point(point, direction=None):
         mutated_coordinates_str = str(x_mutant) + "," + str(y_mutant)
 
         return original_coordinates_str, mutated_coordinates_str, (x_mutant, y_mutant)
+
 
 """def apply_mutoperator1(svg_path, extent):
 
@@ -117,6 +119,7 @@ def mutate_one_point(point, direction=None):
     return path
 """
 
+
 def get_attention_region_prob(xai_image, svg_path_list, sqr_size):
     x_dim = xai_image.shape[0]
     y_dim = xai_image.shape[1]
@@ -151,18 +154,18 @@ def get_attention_region_prob(xai_image, svg_path_list, sqr_size):
 
     sum_xai_list = sum(xai_list)
     list_of_weights = []
-    list_of_probabilities = []
+    # list_of_probabilities = []
 
     for sum_value, pos in zip(xai_list, svg_path_list):
         # TODO 50 is a parameter to be tuned here, originally it was 100
         list_of_weights.append(np.exp((sum_value / sum_xai_list) * 100))
-        #list_of_weights.append((sum_value / sum_xai_list))
+        # list_of_weights.append((sum_value / sum_xai_list))
 
-    #sum_weights_list = sum(list_of_weights)
-    #for weight in list_of_weights:
+    # sum_weights_list = sum(list_of_weights)
+    # for weight in list_of_weights:
     #    list_of_probabilities.append(weight / sum_weights_list)
 
-    return list_of_weights #, list_of_probabilities
+    return list_of_weights  # , list_of_probabilities
 
 
 def cluster_attention_map(map, control_points, weight_threshold=0.1, previous_mask=None):
@@ -188,30 +191,33 @@ def cluster_attention_map(map, control_points, weight_threshold=0.1, previous_ma
 
     clustered_points[weights < weight_threshold] = -1
 
-
     # points = np.array([(i,j) for i in range(num_rows) for j in range(num_cols)])
     # clustered_points = clustered_points.reshape(num_rows, num_rows)
 
     # compute the weights
     centroids_weight = np.zeros(centroids.shape[0])
     new_centroids = np.zeros(centroids.shape)
-    cluster_avg_intensity = np.zeros(centroids.shape[0]) # for reduction of attention
-    cluster_sum_intensity = np.zeros(centroids.shape[0]) # for reduction of attention
+    cluster_avg_intensity = np.zeros(centroids.shape[0])  # for reduction of attention
+    cluster_sum_intensity = np.zeros(centroids.shape[0])  # for reduction of attention
 
     for i in range(centroids.shape[0]):
         points_in_cluster = points[clustered_points == i]
         weights_in_cluster = weights[clustered_points == i]
-        cluster_avg_intensity[i] = np.mean(weights_in_cluster) # for reduction of attention
-        cluster_sum_intensity[i] = np.sum(weights_in_cluster) # for reduction of attention
+        cluster_avg_intensity[i] = np.mean(weights_in_cluster)  # for reduction of attention
+        cluster_sum_intensity[i] = np.sum(weights_in_cluster)  # for reduction of attention
 
         # TODO np.sum(weights_in_cluster) can be zero sometimes
         if np.sum(weights_in_cluster) > 0:
-            new_centroids[i] = np.sum(points_in_cluster.T * weights_in_cluster, axis=1) / np.sum(weights_in_cluster)
+            new_centroids[i] = np.sum(points_in_cluster.T * weights_in_cluster, axis=1) / np.sum(
+                weights_in_cluster
+            )
 
             distances_in_cluster = distances_to_centroid[clustered_points == i]
             distances_in_cluster[distances_in_cluster < 1] = 1
 
-            weights_by_distances = np.multiply(weights_in_cluster, 1. / np.power(distances_in_cluster, 1))
+            weights_by_distances = np.multiply(
+                weights_in_cluster, 1.0 / np.power(distances_in_cluster, 1)
+            )
 
             centroids_weight[i] = np.sum(weights_by_distances)
             # print(f"centroids_weight {i} {centroids_weight[i]}")
@@ -219,15 +225,17 @@ def cluster_attention_map(map, control_points, weight_threshold=0.1, previous_ma
         else:
             new_centroids[i] = np.array([14, 14])
             centroids_weight[i] = 0
-    cluster_rel_intensity = cluster_sum_intensity/cluster_sum_intensity.sum()
+    cluster_rel_intensity = cluster_sum_intensity / cluster_sum_intensity.sum()
     # softmax
-    weight_list = np.exp(centroids_weight / np.sum((centroids_weight), axis=0) *30)
+    weight_list = np.exp(centroids_weight / np.sum((centroids_weight), axis=0) * 30)
     if MUTATION_TYPE == "toward_centroid" or "backward_centroid":
         directions = new_centroids - control_points
         for i, dir in enumerate(directions):
             dir_norm = np.linalg.norm(dir)
             # print(dir_norm)
-            directions[i] = np.array([0, 0]) if dir_norm == 0 or np.isnan(dir_norm) else dir / dir_norm
+            directions[i] = (
+                np.array([0, 0]) if dir_norm == 0 or np.isnan(dir_norm) else dir / dir_norm
+            )
     else:
         directions = None
     return clustered_points, weight_list, directions, previous_percentage, cluster_rel_intensity
@@ -241,20 +249,21 @@ def end_or_middle_points(svg_path, mode):
     """
     control_points = []
     if mode == "end":
-        pattern = re.compile('([\d\.]+),([\d\.]+)\s[MCLZ]')
+        pattern = re.compile("([\d\.]+),([\d\.]+)\s[MCLZ]")
         segments = pattern.findall(svg_path)
-        #svg_iter = re.finditer(pattern, svg_path)
+        # svg_iter = re.finditer(pattern, svg_path)
         control_points = [(float(i[0]), float(i[1])) for i in segments]
-        #print(control_points)
+        # print(control_points)
     elif mode == "mid":
-        pattern = re.compile('C\s([\d\.]+),([\d\.]+)\s([\d\.]+),([\d\.]+)\s')
+        pattern = re.compile("C\s([\d\.]+),([\d\.]+)\s([\d\.]+),([\d\.]+)\s")
         segments = pattern.findall(svg_path)
 
         for i in segments:
             control_points.append((float(i[0]), float(i[1])))
             control_points.append((float(i[2]), float(i[3])))
-        #print(control_points)
+        # print(control_points)
     return control_points
+
 
 """def AM_get_attetion_svg_points_images_prob(svg_path, xai):
     "

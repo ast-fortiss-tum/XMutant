@@ -10,16 +10,22 @@ from random import randint
 from typing import List, Tuple
 
 import numpy as np
-from shapely.errors import ShapelyDeprecationWarning
-from shapely.geometry import Point
-
-from config import ROAD_WIDTH, NUM_SAMPLED_POINTS, NUM_CONTROL_NODES, MAX_ANGLE, SEG_LENGTH, MAX_GENERATION_ATTEMPTS
+from config import (
+    MAX_ANGLE,
+    MAX_GENERATION_ATTEMPTS,
+    NUM_CONTROL_NODES,
+    NUM_SAMPLED_POINTS,
+    ROAD_WIDTH,
+    SEG_LENGTH,
+)
 from driving.bbox import RoadBoundingBox
 from driving.catmull_rom import catmull_rom
 from driving.road import Road
 from driving.road_polygon import RoadPolygon
 from driving.udacity_road import UdacityRoad
 from global_log import GlobalLog
+from shapely.errors import ShapelyDeprecationWarning
+from shapely.geometry import Point
 from test_generators.test_generator import TestGenerator
 from utils.randomness import set_random_seed
 from utils.road_utils import mutate_road
@@ -35,15 +41,15 @@ class OnePlusOneTestGenerator(TestGenerator):
     NUM_UNDO_ATTEMPTS = 20
 
     def __init__(
-            self,
-            map_size: int,
-            num_control_nodes=NUM_CONTROL_NODES,
-            max_angle=MAX_ANGLE,
-            seg_length=SEG_LENGTH,
-            num_spline_nodes=NUM_SAMPLED_POINTS,
-            initial_node=(125.0, 0.0, -28.0, ROAD_WIDTH),  # z = -28.0 (BeamNG), width = 8.0 (BeamNG)
-            mutation_node=(125.0, 0.0, -28.0, ROAD_WIDTH),
-            bbox_size=(0, 0, 250, 250),
+        self,
+        map_size: int,
+        num_control_nodes=NUM_CONTROL_NODES,
+        max_angle=MAX_ANGLE,
+        seg_length=SEG_LENGTH,
+        num_spline_nodes=NUM_SAMPLED_POINTS,
+        initial_node=(125.0, 0.0, -28.0, ROAD_WIDTH),  # z = -28.0 (BeamNG), width = 8.0 (BeamNG)
+        mutation_node=(125.0, 0.0, -28.0, ROAD_WIDTH),
+        bbox_size=(0, 0, 250, 250),
     ):
         super().__init__(map_size=map_size)
         assert num_control_nodes > 1 and num_spline_nodes > 0
@@ -62,12 +68,12 @@ class OnePlusOneTestGenerator(TestGenerator):
 
         self.current_road: Road = None
         self.previous_road: Road = None
-        self.logg = GlobalLog('OnePlusOneTestGenerator')
+        self.logg = GlobalLog("OnePlusOneTestGenerator")
 
         assert not self.road_bbox.intersects_vertices(point=self._get_initial_point())
 
     def set_max_angle(self, max_angle: int) -> None:
-        assert max_angle > 0, 'Max angle must be > 0. Found: {}'.format(max_angle)
+        assert max_angle > 0, "Max angle must be > 0. Found: {}".format(max_angle)
         self.max_angle = max_angle
 
     def generate_control_nodes(self, attempts=NUM_UNDO_ATTEMPTS) -> List[Tuple[float]]:
@@ -84,7 +90,9 @@ class OnePlusOneTestGenerator(TestGenerator):
             attempt = 0
 
             while i_valid < self.num_control_nodes and attempt <= attempts:
-                nodes.append(self._get_next_node(nodes[-2], nodes[-1], self._get_next_max_angle(i_valid)))
+                nodes.append(
+                    self._get_next_node(nodes[-2], nodes[-1], self._get_next_max_angle(i_valid))
+                )
                 road_polygon = RoadPolygon.from_nodes(nodes)
 
                 # budget is the number of iterations used to attempt to add a valid next control node
@@ -94,18 +102,26 @@ class OnePlusOneTestGenerator(TestGenerator):
 
                 intersect_boundary = self.road_bbox.intersects_boundary(road_polygon.polygons[-1])
                 is_valid = road_polygon.is_valid() and (
-                        ((i_valid == 0) and intersect_boundary) or ((i_valid > 0) and not intersect_boundary))
+                    ((i_valid == 0) and intersect_boundary)
+                    or ((i_valid > 0) and not intersect_boundary)
+                )
                 while not is_valid and budget > 0:
                     nodes.pop()
                     budget -= 1
                     attempt += 1
 
-                    nodes.append(self._get_next_node(nodes[-2], nodes[-1], self._get_next_max_angle(i_valid)))
+                    nodes.append(
+                        self._get_next_node(nodes[-2], nodes[-1], self._get_next_max_angle(i_valid))
+                    )
                     road_polygon = RoadPolygon.from_nodes(nodes)
 
-                    intersect_boundary = self.road_bbox.intersects_boundary(road_polygon.polygons[-1])
+                    intersect_boundary = self.road_bbox.intersects_boundary(
+                        road_polygon.polygons[-1]
+                    )
                     is_valid = road_polygon.is_valid() and (
-                            ((i_valid == 0) and intersect_boundary) or ((i_valid > 0) and not intersect_boundary))
+                        ((i_valid == 0) and intersect_boundary)
+                        or ((i_valid > 0) and not intersect_boundary)
+                    )
 
                 if is_valid:
                     i_valid += 1
@@ -126,15 +142,15 @@ class OnePlusOneTestGenerator(TestGenerator):
         return nodes
 
     def is_valid(self, control_nodes, sample_nodes):
-        return (RoadPolygon.from_nodes(sample_nodes).is_valid() and
-                self.road_bbox.contains(RoadPolygon.from_nodes(control_nodes[1:-1])))
+        return RoadPolygon.from_nodes(sample_nodes).is_valid() and self.road_bbox.contains(
+            RoadPolygon.from_nodes(control_nodes[1:-1])
+        )
 
-    def generate(self, mut_info: [int, str] = [None, None]
-                 ) -> Tuple[bool, Road]:
+    def generate(self, mut_info: [int, str] = [None, None]) -> Tuple[bool, Road]:
         """
-                    mut_point: int = None,
-                 mutation_method: str = None
-                """
+           mut_point: int = None,
+        mutation_method: str = None
+        """
         print(mut_info)
         mut_point = mut_info[0]
         mutation_method = mut_info[1]
@@ -185,9 +201,7 @@ class OnePlusOneTestGenerator(TestGenerator):
         control_points = [Point(node[0], node[1], node[2]) for node in control_nodes]
 
         self.current_road = UdacityRoad(
-            road_width=ROAD_WIDTH,
-            road_points=road_points,
-            control_points=control_points
+            road_width=ROAD_WIDTH, road_points=road_points, control_points=control_points
         )
         # (f"road points {sample_nodes}")
         # print(f"control points {control_nodes}")
@@ -203,8 +217,9 @@ class OnePlusOneTestGenerator(TestGenerator):
 
         return x, y, z, width
 
-    def _get_next_node(self, first_node, second_node: Tuple[float, float, float, float], max_angle) \
-            -> Tuple[float, float, float, float]:
+    def _get_next_node(
+        self, first_node, second_node: Tuple[float, float, float, float], max_angle
+    ) -> Tuple[float, float, float, float]:
         v = np.subtract(second_node, first_node)
         start_angle = int(np.degrees(np.arctan2(v[1], v[0])))
         angle = randint(start_angle - max_angle, start_angle + max_angle)
@@ -214,7 +229,9 @@ class OnePlusOneTestGenerator(TestGenerator):
 
     def _get_next_xy(self, x0: float, y0: float, angle: float) -> Tuple[float, float]:
         angle_rad = math.radians(angle)
-        return x0 + self.seg_length * math.cos(angle_rad), y0 + self.seg_length * math.sin(angle_rad)
+        return x0 + self.seg_length * math.cos(angle_rad), y0 + self.seg_length * math.sin(
+            angle_rad
+        )
 
     def _get_next_max_angle(self, i: int, threshold=NUM_INITIAL_SEGMENTS_THRESHOLD) -> float:
         if i < threshold or i == self.num_control_nodes - 1:
@@ -235,10 +252,7 @@ if __name__ == "__main__":
         if info:
             road_test_visualizer = RoadTestVisualizer(map_size=map_size)
             road_test_visualizer.visualize_road_test(
-                road=road,
-                folder_path='../',
-                filename='road',
-                plot_control_points=False
+                road=road, folder_path="../", filename="road", plot_control_points=False
             )
         else:
             sys.exit("Invalid road, generation failed")

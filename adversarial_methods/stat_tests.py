@@ -27,26 +27,28 @@ def cohend(d1, d2):
     d = (u1 - u2) / s
     d = abs(d)
 
-    result = ''
+    result = ""
     if d < 0.2:
-        result = 'negligible'
+        result = "negligible"
     if 0.2 <= d < 0.5:
-        result = 'small'
+        result = "small"
     if 0.5 <= d < 0.8:
-        result = 'medium'
+        result = "medium"
     if d >= 0.8:
-        result = 'large'
+        result = "large"
 
     return result, d
 
 
 def run_wilcoxon_and_cohend(data1, data2):
-    res = wilcoxon(x=data1, y=data2,
-                   zero_method = 'wilcox',
-                   alternative = "two-sided",
-                   #mode='a',
-                   method='auto'# len<50 approx else exact
-                   )
+    res = wilcoxon(
+        x=data1,
+        y=data2,
+        zero_method="wilcox",
+        alternative="two-sided",
+        # mode='a',
+        method="auto",  # len<50 approx else exact
+    )
     cohensd = cohend(data1, data2)
     print(f"statistic is: {res.statistic} P-Value is: {res.pvalue}")
     print(f"Cohen's D is: {cohensd}")
@@ -70,7 +72,7 @@ def main():
     df = pd.DataFrame(columns=col_names, index=["Pvalue", "CohenD"])
     df.idx = np.linspace(1, 1000, 1000)
 
-    df_random = pd.read_csv('../result/csv_folder/record_R_R.csv')
+    df_random = pd.read_csv("../result/csv_folder/record_R_R.csv")
     df_random["id"] = df_random["id"].astype(str) + "_" + df_random["expected_label"].astype(str)
     df_random = df_random[["method", "id", "mutation_number"]]
 
@@ -79,17 +81,20 @@ def main():
         if col != "R_R":
             df_xai = pd.read_csv(csv_file)
             df_xai["id"] = df_xai["id"].astype(str) + "_" + df_xai["expected_label"].astype(str)
-            df_xai = df_xai[["method","id","mutation_number"]]
+            df_xai = df_xai[["method", "id", "mutation_number"]]
             df_merge = pd.merge(df_random, df_xai, on="id")
 
             print("---------------------------------------------------------")
             print(f"Test for {col} and random")
-            pvalue, cohensd = run_wilcoxon_and_cohend(df_merge["mutation_number_x"], df_merge["mutation_number_y"])
+            pvalue, cohensd = run_wilcoxon_and_cohend(
+                df_merge["mutation_number_x"], df_merge["mutation_number_y"]
+            )
             df.at["Pvalue", col] = pvalue
             df.at["CohenD", col] = cohensd[0]
 
     print(df)
-    df.to_csv('../result/csv_folder/stat_tests.csv')
+    df.to_csv("../result/csv_folder/stat_tests.csv")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

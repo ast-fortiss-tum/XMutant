@@ -2,16 +2,15 @@
 # Edited by Antonin Raffin
 import os
 import time
-from typing import Optional, Tuple, Dict
+from typing import Dict, Optional, Tuple
 
 import gym
 import numpy as np
-from gym import spaces
-
-from envs.udacity.config import BASE_PORT, MAX_STEERING, INPUT_DIM
+from envs.udacity.config import BASE_PORT, INPUT_DIM, MAX_STEERING
 from envs.udacity.core.udacity_sim import UdacitySimController
 from envs.unity_proc import UnityProcess
 from global_log import GlobalLog
+from gym import spaces
 from test_generators.test_generator import TestGenerator
 
 
@@ -26,17 +25,17 @@ class UdacityGymEnv(gym.Env):
     }
 
     def __init__(
-            self,
-            seed: int,
-            test_generator: TestGenerator = None,
-            headless: bool = False,
-            exe_path: str = None,
+        self,
+        seed: int,
+        test_generator: TestGenerator = None,
+        headless: bool = False,
+        exe_path: str = None,
     ):
 
         self.seed = seed
         self.exe_path = exe_path
-        self.logger = GlobalLog('UdacityGymEnv')
-        #self.test_generator = test_generator
+        self.logger = GlobalLog("UdacityGymEnv")
+        # self.test_generator = test_generator
         if headless:
             self.logger.warn("Headless mode not supported with Udacity")
         self.headless = False
@@ -48,7 +47,7 @@ class UdacityGymEnv(gym.Env):
     def start_unity(self):
         if self.exe_path is not None:
             self.logger.info("Starting UdacityGym env")
-            assert os.path.exists(self.exe_path), 'Path {} does not exist'.format(self.exe_path)
+            assert os.path.exists(self.exe_path), "Path {} does not exist".format(self.exe_path)
             # Start Unity simulation subprocess if needed
             self.unity_process = UnityProcess()
             self.unity_process.start(sim_path=self.exe_path, headless=False, port=self.port)
@@ -57,9 +56,7 @@ class UdacityGymEnv(gym.Env):
 
         # steering + throttle, action space must be symmetric
         self.action_space = spaces.Box(
-            low=np.array([-MAX_STEERING, -1]),
-            high=np.array([MAX_STEERING, 1]),
-            dtype=np.float32
+            low=np.array([-MAX_STEERING, -1]), high=np.array([MAX_STEERING, 1]), dtype=np.float32
         )
 
         self.observation_space = spaces.Box(low=0, high=255, shape=INPUT_DIM, dtype=np.uint8)
@@ -77,15 +74,13 @@ class UdacityGymEnv(gym.Env):
 
         return observation, done, info
 
-    def reset(self,
-              mutation_info: [int, str] = [None, None],
-              skip_generation: bool = False) \
-            -> np.ndarray:
+    def reset(
+        self, mutation_info: [int, str] = [None, None], skip_generation: bool = False
+    ) -> np.ndarray:
 
         # -------------------------------------------------------------------------------
-        
-        
-        #self.unity_process = None
+
+        # self.unity_process = None
 
         self.start_unity()
         # -------------------------------------------------------------------------------
@@ -94,8 +89,8 @@ class UdacityGymEnv(gym.Env):
         observation, done, info = self.observe()
         return observation
 
-    def render(self, mode: str = 'human') -> Optional[np.ndarray]:
-        if mode == 'rgb_array':
+    def render(self, mode: str = "human") -> Optional[np.ndarray]:
+        if mode == "rgb_array":
             return self.executor.image_array
         return None
 

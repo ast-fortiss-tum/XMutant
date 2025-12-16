@@ -1,27 +1,34 @@
+import csv
+from os.path import exists, join
 
 import numpy as np
-from os.path import join, exists
-import csv
-
-from tensorflow.keras.datasets import imdb
-from config import (POPSIZE, REPORT_NAME, MUTATION_RECORD, XAI_METHOD)
-from config import (MAX_SEQUENCE_LENGTH, NUM_DISTINCT_WORDS,
-                    DEFAULT_WORD_ID, INDEX_FROM)
-from individual import Individual
-from xai_imdb import xai_embedding, lime_batch_explainer
 import utils
-from predictor import Predictor
+from config import (
+    DEFAULT_WORD_ID,
+    INDEX_FROM,
+    MAX_SEQUENCE_LENGTH,
+    MUTATION_RECORD,
+    NUM_DISTINCT_WORDS,
+    POPSIZE,
+    REPORT_NAME,
+    XAI_METHOD,
+)
+from individual import Individual
 from mutation_manager import mutate, mutate_lime
-import time
-import logging as log
+from predictor import Predictor
+from tensorflow.keras.datasets import imdb
+from xai_imdb import lime_batch_explainer, xai_embedding
 
 predictor = Predictor()
 
+
 def load_imdb_test(pop_size, seed=0):
-    (_, _), (x_test, y_test) = imdb.load_data(num_words=NUM_DISTINCT_WORDS,
-                                                          start_char=DEFAULT_WORD_ID['<start>'],
-                                                          oov_char=DEFAULT_WORD_ID['<unk>'],
-                                                          index_from=INDEX_FROM)
+    (_, _), (x_test, y_test) = imdb.load_data(
+        num_words=NUM_DISTINCT_WORDS,
+        start_char=DEFAULT_WORD_ID["<start>"],
+        oov_char=DEFAULT_WORD_ID["<unk>"],
+        index_from=INDEX_FROM,
+    )
     np.random.seed(seed=seed)
     assert pop_size < x_test.shape[0], "popsize must be smaller than training size"
 
@@ -44,12 +51,14 @@ def load_imdb_test(pop_size, seed=0):
 # x, y = load_imdb_test(popsize= 10)
 # y_pre, _ = predictor.predict(x)
 
+
 class Population:
     def __init__(self, pop_size=POPSIZE, xai_method=XAI_METHOD):
 
         x_test, y_test = load_imdb_test(pop_size)
-        self.population_to_mutate = [Individual(id=i, token_ids=x, label=y) for i, (x, y) in
-                                     enumerate(zip(x_test, y_test))]
+        self.population_to_mutate = [
+            Individual(id=i, token_ids=x, label=y) for i, (x, y) in enumerate(zip(x_test, y_test))
+        ]
         self.size = len(self.population_to_mutate)
         self.xai_method = xai_method
 
@@ -59,7 +68,7 @@ class Population:
 
         # self.attention = AttentionManager(num=self.digit, attention_method=self.xai_method)
 
-    def evaluate_population(self, gen_number, folder): #
+    def evaluate_population(self, gen_number, folder):  #
         # batch evaluation for
         #         Individual.predicted_label
         #         Individual.confidence
@@ -79,17 +88,22 @@ class Population:
             explanation = lime_batch_explainer(predictor.predict_texts_xai, batch_individual)
         elif self.xai_method == "Random":
             # assgin random attention map for random method
-            explanation = np.random.rand(len(batch_individual), MAX_SEQUENCE_LENGTH) #[1] * len(batch_individual)
+            explanation = np.random.rand(
+                len(batch_individual), MAX_SEQUENCE_LENGTH
+            )  # [1] * len(batch_individual)
         else:
-            explanation = xai_embedding(predictor.model,
-                                        batch_individual,
-                                        xai_method=self.xai_method,
-                                        target_class=batch_label)
+            explanation = xai_embedding(
+                predictor.model,
+                batch_individual,
+                xai_method=self.xai_method,
+                target_class=batch_label,
+            )
 
-        predictions, confidences = (predictor.predict(batch_individual))
+        predictions, confidences = predictor.predict(batch_individual)
         # label result and detect misclassified
-        for ind, prediction, confidence, attmap \
-                in zip(self.population_to_mutate, predictions, confidences, explanation):
+        for ind, prediction, confidence, attmap in zip(
+            self.population_to_mutate, predictions, confidences, explanation
+        ):
             ind.confidence = confidence
             ind.predicted_label = prediction
             ind.misclassified = ind.expected_label != ind.predicted_label
@@ -106,10 +120,9 @@ class Population:
                 self.finished_population.append(ind)
                 if ind.misclassified:
                     self.misclassified_number += 1
-                    ind.export(folder.archive_folder )
+                    ind.export(folder.archive_folder)
                 # if MUTATION_RECORD:
                 #     ind.save_mutation_log(folder)
-
 
     def mutate_population(self):
         batch_individual = [ind for ind in self.population_to_mutate]
@@ -131,63 +144,71 @@ class Population:
 
     def create_report(self, path, gen_number, seed):
         dst = join(path, REPORT_NAME)
-        with open(dst, mode='w') as report_file:
-            report_writer = csv.writer(report_file,
-                                       delimiter=',',
-                                       quotechar='"',
-                                       quoting=csv.QUOTE_MINIMAL)
-            report_writer.writerow(['population size',
-                                    'total iteration number',
-                                    'misbehaviour number'])
-            report_writer.writerow([self.size,
-                                    gen_number,
-                                    self.misclassified_number
-                                    ])
+        with open(dst, mode="w") as report_file:
+            report_writer = csv.writer(
+                report_file, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
+            )
+            report_writer.writerow(
+                ["population size", "total iteration number", "misbehaviour number"]
+            )
+            report_writer.writerow([self.size, gen_number, self.misclassified_number])
 
-            report_writer.writerow('')
+            report_writer.writerow("")
 
-            report_writer.writerow(['id',
-                                    'expected_label',
-                                    'predicted_label',
-                                    'misbehaviour',
-                                    'confidence',
-                                    'mutate_attempts',
-                                    'failed'])
+            report_writer.writerow(
+                [
+                    "id",
+                    "expected_label",
+                    "predicted_label",
+                    "misbehaviour",
+                    "confidence",
+                    "mutate_attempts",
+                    "failed",
+                ]
+            )
 
             for ind in [*self.finished_population, *self.population_to_mutate]:
-                report_writer.writerow([ind.id,
-                                        ind.expected_label,
-                                        ind.predicted_label,
-                                        ind.misclassified,
-                                        ind.confidence,
-                                        ind.mutate_attempts,
-                                        ind.fail])
+                report_writer.writerow(
+                    [
+                        ind.id,
+                        ind.expected_label,
+                        ind.predicted_label,
+                        ind.misclassified,
+                        ind.confidence,
+                        ind.mutate_attempts,
+                        ind.fail,
+                    ]
+                )
 
         # summary table
-        table_name = './runs/summary.csv'
+        table_name = "./runs/summary.csv"
 
-        data = [self.size,
-                gen_number,
-                self.xai_method,
-                self.misclassified_number,
-                "{:.2f}%".format(self.misclassified_number/self.size*100),
-                seed]
+        data = [
+            self.size,
+            gen_number,
+            self.xai_method,
+            self.misclassified_number,
+            "{:.2f}%".format(self.misclassified_number / self.size * 100),
+            seed,
+        ]
 
         # create csv if it's not existed
         if not exists(table_name):
-            with open(table_name, 'w', newline='') as file:
+            with open(table_name, "w", newline="") as file:
                 writer = csv.writer(file)
-                headers = ['population size',
-                           'total iteration number',
-                           'attention method',
-                           'misbehaviour number',
-                           'misbehaviour Percentage',
-                           'seed']
+                headers = [
+                    "population size",
+                    "total iteration number",
+                    "attention method",
+                    "misbehaviour number",
+                    "misbehaviour Percentage",
+                    "seed",
+                ]
                 writer.writerow(headers)
                 writer.writerow(data)
         else:
             # only write data when csv is already existed
-            with open(table_name, 'a', newline='') as file:
+            with open(table_name, "a", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerow(data)
 
@@ -203,6 +224,5 @@ if __name__ == "__main__":
         pop.evaluate_population(idx)
         print([ind.confidence for ind in pop.population_to_mutate])
         pop.mutate_population()
-
 
     print(f" Misclass number {pop.misclassified_number}")

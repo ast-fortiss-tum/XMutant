@@ -22,23 +22,23 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+
 # Original author: Tawn Kramer
 
 import base64
 import time
 from io import BytesIO
 from threading import Thread
-from typing import Tuple, Dict
+from typing import Dict, Tuple
 
 import numpy as np
 import socketio
-from PIL import Image
-from flask import Flask
-
+from driving.road import Road
 from envs.udacity.config import INPUT_DIM, MAX_CTE_ERROR
 from envs.udacity.core.client import start_app
+from flask import Flask
 from global_log import GlobalLog
-from driving.road import Road
+from PIL import Image
 from test_generators.test_generator import TestGenerator
 
 sio = socketio.Server()
@@ -62,7 +62,7 @@ pos_y = 0.0
 pos_z = 0.0
 
 
-@sio.on('connect')
+@sio.on("connect")
 def connect(sid, environ) -> None:
     global is_connect
     is_connect = True
@@ -74,17 +74,17 @@ def send_control(steering_angle: float, throttle: float) -> None:
     sio.emit(
         "steer",
         data={
-            'steering_angle': steering_angle.__str__(),
-            'throttle': throttle.__str__(),
+            "steering_angle": steering_angle.__str__(),
+            "throttle": throttle.__str__(),
         },
-        skip_sid=True
+        skip_sid=True,
     )
 
 
 def send_track(track_string: str) -> None:
     global track_sent
     if not track_sent:
-        sio.emit("track", data={'track_string': track_string}, skip_sid=True)
+        sio.emit("track", data={"track_string": track_string}, skip_sid=True)
         track_sent = True
 
 
@@ -92,7 +92,7 @@ def send_reset() -> None:
     sio.emit("reset", data={}, skip_sid=True)
 
 
-@sio.on('telemetry')
+@sio.on("telemetry")
 def telemetry(sid, data) -> None:
     global steering
     global throttle
@@ -116,7 +116,7 @@ def telemetry(sid, data) -> None:
         pos_y = float(data["pos_y"].replace(",", ""))
         pos_z = float(data["pos_z"].replace(",", ""))
         hit = data["hit"]
-        deployed_track_string = data['track']
+        deployed_track_string = data["track"]
         # The current image from the center camera of the car
         image = Image.open(BytesIO(base64.b64decode(data["image"])))
         image_array = np.copy(np.array(image))
@@ -136,9 +136,9 @@ class UdacitySimController:
     """
 
     def __init__(
-            self,
-            port: int,
-            test_generator: TestGenerator = None,
+        self,
+        port: int,
+        test_generator: TestGenerator = None,
     ):
         self.port = port
         # sensor size - height, width, depth
@@ -151,19 +151,17 @@ class UdacitySimController:
         self.current_track = None
         self.image_array = np.zeros(self.camera_img_size)
 
-        self.logger = GlobalLog('UdacitySimController')
+        self.logger = GlobalLog("UdacitySimController")
 
         self.client_thread = Thread(target=start_app, args=(flask_app, sio, self.port))
         self.client_thread.daemon = True
         self.client_thread.start()
-        self.logger = GlobalLog('UdacitySimController')
+        self.logger = GlobalLog("UdacitySimController")
 
         while not is_connect:
             time.sleep(0.3)
 
-    def reset(self,
-              mut_info: [int, str] = [None, None],
-              skip_generation: bool = False) -> None:
+    def reset(self, mut_info: [int, str] = [None, None], skip_generation: bool = False) -> None:
 
         global last_obs
         global speed
@@ -200,7 +198,7 @@ class UdacitySimController:
         self.track_is_success = False
 
         if not skip_generation:
-            assert self.test_generator is not None, 'Test generator is not instantiated'
+            assert self.test_generator is not None, "Test generator is not instantiated"
             self.generate_track(mut_info=mut_info)
 
         time.sleep(1)
@@ -210,16 +208,17 @@ class UdacitySimController:
 
         if generated_track is None:
             start_time = time.perf_counter()
-            self.logger.debug('Start generating track')
+            self.logger.debug("Start generating track")
             self.track_is_success, track = self.test_generator.generate(mut_info)
             self.current_track = track
             self.logger.debug(track.get_control_points())
-            self.logger.debug('Track generated: {:.2f}s'.format(time.perf_counter() - start_time))
+            self.logger.debug("Track generated: {:.2f}s".format(time.perf_counter() - start_time))
         else:
             self.current_track = generated_track
 
         generated_track_string = self.current_track.serialize_concrete_representation(
-            cr=self.current_track.get_concrete_representation())
+            cr=self.current_track.get_concrete_representation()
+        )
 
     @staticmethod
     def take_action(action: np.ndarray) -> None:
@@ -249,20 +248,19 @@ class UdacitySimController:
         done = self.is_game_over()
 
         info = {
-            'is_success': self.is_success,
-            'track': self.current_track,
-            'track_info': self.track_is_success,
-            'speed': speed,
-            'pos': (pos_x, pos_z),
-            'cte': cte,
-            'throttle': throttle,
-            'steering': steering
+            "is_success": self.is_success,
+            "track": self.current_track,
+            "track_info": self.track_is_success,
+            "speed": speed,
+            "pos": (pos_x, pos_z),
+            "cte": cte,
+            "throttle": throttle,
+            "steering": steering,
         }
         return last_obs, done, info
 
-
     def quit(self):
-        self.logger.info('Stopping client')
+        self.logger.info("Stopping client")
 
     def is_game_over(self) -> bool:
         global cte

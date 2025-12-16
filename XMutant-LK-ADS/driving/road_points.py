@@ -21,10 +21,11 @@ class RoadPoints:
     def add_middle_nodes(self, middle_nodes):
         n = len(self.middle) + len(middle_nodes)
 
-        assert n >= 2, f'At least, two nodes are needed'
+        assert n >= 2, "At least, two nodes are needed"
 
-        assert all(len(point) >= 4 for point in middle_nodes), \
-            f'A node is a tuple of 4 elements (x,y,z,road_width)'
+        assert all(
+            len(point) >= 4 for point in middle_nodes
+        ), "A node is a tuple of 4 elements (x,y,z,road_width)"
 
         self.n = n
         self.middle += list(middle_nodes)
@@ -55,9 +56,10 @@ class RoadPoints:
         r = origin + np.array([v[1], -v[0]])
         return tuple(l), tuple(r)
 
-    def vehicle_start_pose(self, meters_from_road_start=2.5, road_point_index=0) \
-            -> Pose:
-        assert self.n > road_point_index, f'road length is {self.n} it does not have index {road_point_index}'
+    def vehicle_start_pose(self, meters_from_road_start=2.5, road_point_index=0) -> Pose:
+        assert (
+            self.n > road_point_index
+        ), f"road length is {self.n} it does not have index {road_point_index}"
         p1 = self.middle[road_point_index]
         p1r = self.right[road_point_index]
         p2 = self.middle[road_point_index + 1]
@@ -71,6 +73,7 @@ class RoadPoints:
 
     def new_imagery(self):
         from .road_imagery import RoadImagery
+
         return RoadImagery(self)
 
     def plot_on_ax(self, ax) -> None:
@@ -78,8 +81,8 @@ class RoadPoints:
             tup = list(zip(*points))
             ax.plot(tup[0], tup[1], color=color, linewidth=linewidth)
 
-        ax.set_facecolor('#7D9051')  # green
-        _plot_xy(self.middle, '#FEA952', linewidth=1)  # arancio
-        _plot_xy(self.left, 'white', linewidth=1)
-        _plot_xy(self.right, 'white', linewidth=1)
-        ax.axis('equal')
+        ax.set_facecolor("#7D9051")  # green
+        _plot_xy(self.middle, "#FEA952", linewidth=1)  # arancio
+        _plot_xy(self.left, "white", linewidth=1)
+        _plot_xy(self.right, "white", linewidth=1)
+        ax.axis("equal")

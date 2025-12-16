@@ -1,7 +1,6 @@
-from global_log import GlobalLog
-import numpy as np
 import random
 
+import numpy as np
 import tensorflow as tf
 
 
@@ -14,4 +13,3 @@ def set_random_seed(seed):
     # tf.random.set_seed(seed)
 
     tf.keras.utils.set_random_seed(seed)
-

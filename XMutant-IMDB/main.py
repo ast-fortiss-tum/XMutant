@@ -1,14 +1,7 @@
-import time
-
 import numpy as np
-import random
-import csv
-
-from config import POPSIZE, NGEN, XAI_METHOD, SEED
-from population import Population
-# from timer import Timer
-import time
+from config import NGEN, POPSIZE, SEED, XAI_METHOD
 from folder import Folder
+from population import Population
 from utils import set_all_seeds
 
 # import tensorflow as tf
@@ -17,6 +10,7 @@ from utils import set_all_seeds
 # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 set_all_seeds(SEED)
+
 
 def main(popsize=POPSIZE, xai_method=XAI_METHOD):
 
@@ -32,9 +26,18 @@ def main(popsize=POPSIZE, xai_method=XAI_METHOD):
         pop.evaluate_population(gen, folder)
         confidences = [ind.confidence for ind in pop.population_to_mutate]
         if len(confidences) > 0:
-            print('Iteration:{:4}, Mis-number:{:3}, Pop-number:{:3}, avg:{:1.10f}, min:{:2.4f}, max:{:1.4f}'
-                  .format(*[gen, pop.misclassified_number, len(confidences), np.mean(confidences),
-                            np.min(confidences), np.max(confidences)]))
+            print(
+                "Iteration:{:4}, Mis-number:{:3}, Pop-number:{:3}, avg:{:1.10f}, min:{:2.4f}, max:{:1.4f}".format(
+                    *[
+                        gen,
+                        pop.misclassified_number,
+                        len(confidences),
+                        np.mean(confidences),
+                        np.min(confidences),
+                        np.max(confidences),
+                    ]
+                )
+            )
             pop.mutate_population()
             gen += 1
 
@@ -51,16 +54,15 @@ def main(popsize=POPSIZE, xai_method=XAI_METHOD):
               .format(*[gen, pop.misclass_number, len(confidences), np.mean(confidences),
                         np.min(confidences), np.max(confidences), ]))"""
 
-    print(f"MUTATION FINISHED")
+    print("MUTATION FINISHED")
     # record data
     pop.create_report(folder.DST, gen, SEED)
     print("REPORT GENERATED")
 
 
-
 if __name__ == "__main__":
     main(popsize=3)
-    
+
     # random vit_model
     # for digit in range(10): # range(10):
     #     set_all_seeds(digit)

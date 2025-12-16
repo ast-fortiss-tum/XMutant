@@ -21,10 +21,21 @@ class DLFuzz:
 
     """
 
-    def __init__(self, model,  neuron_select_strategy=None, threshold=0.5, neuron_to_cover_num=5, iteration_times=5,
-                    neuron_to_cover_weight=.05, predict_weight=0.5, learning_step=0.02):
+    def __init__(
+        self,
+        model,
+        neuron_select_strategy=None,
+        threshold=0.5,
+        neuron_to_cover_num=5,
+        iteration_times=5,
+        neuron_to_cover_weight=0.05,
+        predict_weight=0.5,
+        learning_step=0.02,
+    ):
         self.model = model
-        self.neuron_select_strategy = ["2"] if neuron_select_strategy is None else neuron_select_strategy
+        self.neuron_select_strategy = (
+            ["2"] if neuron_select_strategy is None else neuron_select_strategy
+        )
         self.threshold = threshold
         self.neuron_to_cover_num = neuron_to_cover_num
         self.iteration_times = iteration_times
@@ -38,14 +49,16 @@ class DLFuzz:
             self.neuron_to_cover_weight = 2
 
         self.model_layer_times1 = self.init_coverage_times(model)  # times of each neuron covered
-        self.model_layer_times2 = self.init_coverage_times(model)  # update when new image and adversarial images found
+        self.model_layer_times2 = self.init_coverage_times(
+            model
+        )  # update when new image and adversarial images found
         self.model_layer_value1 = self.init_coverage_value(model)
 
     @staticmethod
     def init_times(model, model_layer_times):
         """init times with zeros"""
         for layer in model.layers:
-            if 'flatten' in layer.name or 'input' in layer.name:
+            if "flatten" in layer.name or "input" in layer.name:
                 continue
             for index in range(layer.output_shape[-1]):
                 model_layer_times[(layer.name, index)] = 0
@@ -75,14 +88,17 @@ class DLFuzz:
     @staticmethod
     def scale(intermediate_layer_output, rmax=1, rmin=0):
         X_std = (intermediate_layer_output - intermediate_layer_output.min()) / (
-                intermediate_layer_output.max() - intermediate_layer_output.min())
+            intermediate_layer_output.max() - intermediate_layer_output.min()
+        )
         X_scaled = X_std * (rmax - rmin) + rmin
         return X_scaled
 
     @staticmethod
     def random_strategy(model, model_layer_times, neuron_to_cover_num):
         loss_neuron = []
-        not_covered = [(layer_name, index) for (layer_name, index), v in model_layer_times.items() if v == 0]
+        not_covered = [
+            (layer_name, index) for (layer_name, index), v in model_layer_times.items() if v == 0
+        ]
         for _ in range(neuron_to_cover_num):
             layer_name, index = DLFuzz.neuron_to_cover(not_covered, model_layer_times)
             loss00_neuron = K.mean(model.get_layer(layer_name).output[..., index])
@@ -96,13 +112,18 @@ class DLFuzz:
 
     @staticmethod
     def update_coverage(input_data, model, model_layer_times, threshold=0.0):
-        layer_names = [layer.name for layer in model.layers if
-                       'flatten' not in layer.name and
-                       'input' not in layer.name and
-                       'reshape' not in layer.name and
-                       'dropout' not in layer.name]
-        intermediate_layer_model = Model(inputs=model.input,
-                                         outputs=[model.get_layer(layer_name).output for layer_name in layer_names])
+        layer_names = [
+            layer.name
+            for layer in model.layers
+            if "flatten" not in layer.name
+            and "input" not in layer.name
+            and "reshape" not in layer.name
+            and "dropout" not in layer.name
+        ]
+        intermediate_layer_model = Model(
+            inputs=model.input,
+            outputs=[model.get_layer(layer_name).output for layer_name in layer_names],
+        )
         intermediate_layer_outputs = intermediate_layer_model(input_data)
 
         for i, intermediate_layer_output in enumerate(intermediate_layer_outputs):
@@ -110,19 +131,25 @@ class DLFuzz:
             scaled = DLFuzz.scale(intermediate_layer_output[0])
             # xrange(scaled.shape[-1])
             for num_neuron in range(scaled.shape[-1]):
-                if np.mean(scaled[
-                               ..., num_neuron]) > threshold:  # and model_layer_dict[(layer_names[i], num_neuron)] == 0:
+                if (
+                    np.mean(scaled[..., num_neuron]) > threshold
+                ):  # and model_layer_dict[(layer_names[i], num_neuron)] == 0:
                     model_layer_times[(layer_names[i], num_neuron)] += 1
 
         return intermediate_layer_outputs
 
     @staticmethod
     def update_coverage_value(input_data, model, model_layer_value):
-        layer_names = [layer.name for layer in model.layers if
-                       'flatten' not in layer.name and 'input' not in layer.name]
+        layer_names = [
+            layer.name
+            for layer in model.layers
+            if "flatten" not in layer.name and "input" not in layer.name
+        ]
 
-        intermediate_layer_model = Model(inputs=model.input,
-                                         outputs=[model.get_layer(layer_name).output for layer_name in layer_names])
+        intermediate_layer_model = Model(
+            inputs=model.input,
+            outputs=[model.get_layer(layer_name).output for layer_name in layer_names],
+        )
         intermediate_layer_outputs = intermediate_layer_model(input_data)
 
         for i, intermediate_layer_output in enumerate(intermediate_layer_outputs):
@@ -150,7 +177,9 @@ class DLFuzz:
                     continue
                 model_layer_weights_dict[(layer_name, index)] = index_w
         # notice!
-        model_layer_weights_list = sorted(model_layer_weights_dict.items(), key=lambda x: x[1], reverse=True)
+        model_layer_weights_list = sorted(
+            model_layer_weights_dict.items(), key=lambda x: x[1], reverse=True
+        )
 
         k = 0
         for (layer_name, index), weight in model_layer_weights_list:
@@ -160,18 +189,24 @@ class DLFuzz:
             k += 1
 
     @staticmethod
-    def neuron_selection(model, input_tensor, model_layer_times, model_layer_value, neuron_select_strategy,
-                         neuron_to_cover_num,
-                         threshold):
-        if neuron_select_strategy == 'None':
+    def neuron_selection(
+        model,
+        input_tensor,
+        model_layer_times,
+        model_layer_value,
+        neuron_select_strategy,
+        neuron_to_cover_num,
+        threshold,
+    ):
+        if neuron_select_strategy == "None":
             return DLFuzz.random_strategy(model, model_layer_times, neuron_to_cover_num)
 
-        num_strategy = len([x for x in neuron_select_strategy if x in ['0', '1', '2', '3']])
+        num_strategy = len([x for x in neuron_select_strategy if x in ["0", "1", "2", "3"]])
         neuron_to_cover_num_each = neuron_to_cover_num // num_strategy
 
         loss_neuron = []
         # initialization for strategies
-        if ('0' in list(neuron_select_strategy)) or ('1' in list(neuron_select_strategy)):
+        if ("0" in list(neuron_select_strategy)) or ("1" in list(neuron_select_strategy)):
             i = 0
             neurons_covered_times = []
             neurons_key_pos = {}
@@ -183,61 +218,87 @@ class DLFuzz:
             times_total = sum(neurons_covered_times)
 
         # select neurons covered often
-        if '0' in list(neuron_select_strategy):
+        if "0" in list(neuron_select_strategy):
             if times_total == 0:
-                return DLFuzz.random_strategy(model, model_layer_times, 1)  # The beginning of no neurons covered
+                return DLFuzz.random_strategy(
+                    model, model_layer_times, 1
+                )  # The beginning of no neurons covered
             neurons_covered_percentage = neurons_covered_times / float(times_total)
             # num_neuron0 = np.random.choice(range(len(neurons_covered_times)), p=neurons_covered_percentage)
-            num_neuron0 = np.random.choice(range(len(neurons_covered_times)), neuron_to_cover_num_each, replace=False,
-                                           p=neurons_covered_percentage)
+            num_neuron0 = np.random.choice(
+                range(len(neurons_covered_times)),
+                neuron_to_cover_num_each,
+                replace=False,
+                p=neurons_covered_percentage,
+            )
             for num in num_neuron0:
                 layer_name0, index0 = neurons_key_pos[num]
                 # loss0_neuron = tf.reduce_mean(model.get_layer(layer_name0).output[..., index0])
                 loss0_neuron = tf.reduce_mean(
-                    Model(inputs=model.inputs, outputs=model.get_layer().output)(input_tensor)[[..., index0]])
+                    Model(inputs=model.inputs, outputs=model.get_layer().output)(input_tensor)[
+                        [..., index0]
+                    ]
+                )
                 loss_neuron.append(loss0_neuron)
 
         # select neurons covered rarely
-        if '1' in list(neuron_select_strategy):
+        if "1" in list(neuron_select_strategy):
             if times_total == 0:
                 return DLFuzz.random_strategy(model, model_layer_times, 1)
-            neurons_covered_times_inverse = np.subtract(max(neurons_covered_times), neurons_covered_times)
+            neurons_covered_times_inverse = np.subtract(
+                max(neurons_covered_times), neurons_covered_times
+            )
             neurons_covered_percentage_inverse = neurons_covered_times_inverse / float(
-                sum(neurons_covered_times_inverse))
+                sum(neurons_covered_times_inverse)
+            )
             # num_neuron1 = np.random.choice(range(len(neurons_covered_times)), p=neurons_covered_percentage_inverse)
-            num_neuron1 = np.random.choice(range(len(neurons_covered_times)), neuron_to_cover_num_each, replace=False,
-                                           p=neurons_covered_percentage_inverse)
+            num_neuron1 = np.random.choice(
+                range(len(neurons_covered_times)),
+                neuron_to_cover_num_each,
+                replace=False,
+                p=neurons_covered_percentage_inverse,
+            )
             for num in num_neuron1:
                 layer_name1, index1 = neurons_key_pos[num]
                 # loss1_neuron = tf.reduce_mean(model.get_layer(layer_name1).output[..., index1])
                 loss1_neuron = tf.reduce_mean(
-                    Model(inputs=model.inputs, outputs=model.get_layer(layer_name1).output)(input_tensor)[..., index1])
+                    Model(inputs=model.inputs, outputs=model.get_layer(layer_name1).output)(
+                        input_tensor
+                    )[..., index1]
+                )
 
                 loss_neuron.append(loss1_neuron)
 
         # select neurons with largest weights (feature maps with largest filter weights)
-        if '2' in list(neuron_select_strategy):
-            layer_names = [layer.name for layer in model.layers if
-                           'flatten' not in layer.name and 'input' not in layer.name]
+        if "2" in list(neuron_select_strategy):
+            layer_names = [
+                layer.name
+                for layer in model.layers
+                if "flatten" not in layer.name and "input" not in layer.name
+            ]
             k = 0.1
             top_k = k * len(model_layer_times)  # number of neurons to be selected within
             global model_layer_weights_top_k
             if len(model_layer_weights_top_k) == 0:
                 DLFuzz.neuron_select_high_weight(model, layer_names, top_k)  # Set the value
 
-            num_neuron2 = np.random.choice(range(len(model_layer_weights_top_k)), neuron_to_cover_num_each,
-                                           replace=False)
+            num_neuron2 = np.random.choice(
+                range(len(model_layer_weights_top_k)), neuron_to_cover_num_each, replace=False
+            )
             for i in num_neuron2:
                 # i = np.random.choice(range(len(model_layer_weights_top_k)))
                 layer_name2 = model_layer_weights_top_k[i][0]
                 index2 = model_layer_weights_top_k[i][1]
                 # loss2_neuron = tf.reduce_mean(model.get_layer(layer_name2).output[..., index2])
                 loss2_neuron = tf.reduce_mean(
-                    Model(inputs=model.inputs, outputs=model.get_layer(layer_name2).output)(input_tensor)[..., index2])
+                    Model(inputs=model.inputs, outputs=model.get_layer(layer_name2).output)(
+                        input_tensor
+                    )[..., index2]
+                )
 
                 loss_neuron.append(loss2_neuron)
 
-        if '3' in list(neuron_select_strategy):
+        if "3" in list(neuron_select_strategy):
             above_threshold = []
             below_threshold = []
             above_num = neuron_to_cover_num_each / 2
@@ -245,16 +306,28 @@ class DLFuzz:
             above_i = 0
             below_i = 0
             for (layer_name, index), value in model_layer_value.items():
-                if threshold + 0.25 > value > threshold and layer_name != 'fc1' and layer_name != 'fc2' and \
-                        layer_name != 'predictions' and layer_name != 'fc1000' and layer_name != 'before_softmax' \
-                        and above_i < above_num:
+                if (
+                    threshold + 0.25 > value > threshold
+                    and layer_name != "fc1"
+                    and layer_name != "fc2"
+                    and layer_name != "predictions"
+                    and layer_name != "fc1000"
+                    and layer_name != "before_softmax"
+                    and above_i < above_num
+                ):
                     above_threshold.append([layer_name, index])
                     above_i += 1
                     # print(layer_name,index,value)
                     # above_threshold_dict[(layer_name, index)]=value
-                elif threshold > value > threshold - 0.2 and layer_name != 'fc1' and layer_name != 'fc2' and \
-                        layer_name != 'predictions' and layer_name != 'fc1000' and layer_name != 'before_softmax' \
-                        and below_i < below_num:
+                elif (
+                    threshold > value > threshold - 0.2
+                    and layer_name != "fc1"
+                    and layer_name != "fc2"
+                    and layer_name != "predictions"
+                    and layer_name != "fc1000"
+                    and layer_name != "before_softmax"
+                    and below_i < below_num
+                ):
                     below_threshold.append([layer_name, index])
                     below_i += 1
             #
@@ -264,15 +337,21 @@ class DLFuzz:
             if len(above_threshold) > 0:
                 for above_item in range(len(above_threshold)):
                     loss3_neuron_above = tf.reduce_mean(
-                        Model(inputs=model.inputs, outputs=model.get_layer(above_threshold[above_item][0]).output)(
-                            input_tensor)[..., above_threshold[above_item][1]])
+                        Model(
+                            inputs=model.inputs,
+                            outputs=model.get_layer(above_threshold[above_item][0]).output,
+                        )(input_tensor)[..., above_threshold[above_item][1]]
+                    )
                     loss_neuron.append(loss3_neuron_above)
 
             if len(below_threshold) > 0:
                 for below_item in range(len(below_threshold)):
                     loss3_neuron_below = -tf.reduce_mean(
-                        Model(inputs=model.inputs, outputs=model.get_layer(below_threshold[below_item][0]).output)(
-                            input_tensor)[..., below_threshold[below_item][1]])
+                        Model(
+                            inputs=model.inputs,
+                            outputs=model.get_layer(below_threshold[below_item][0]).output,
+                        )(input_tensor)[..., below_threshold[below_item][1]]
+                    )
                     loss_neuron.append(loss3_neuron_below)
 
             # loss_neuron += loss3_neuron_below - loss3_neuron_above
@@ -292,7 +371,9 @@ class DLFuzz:
             #     loss3_neuron_below = tf.reduce_mean(model.get_layer(below_threshold[below_i][0]).output[..., below_threshold[below_i][1]])
             # loss_neuron += loss3_neuron_below - loss3_neuron_above
             if loss_neuron == 0:
-                return DLFuzz.random_strategy(model, model_layer_times, 1)  # The beginning of no neurons covered
+                return DLFuzz.random_strategy(
+                    model, model_layer_times, 1
+                )  # The beginning of no neurons covered
 
         return loss_neuron
 
@@ -305,13 +386,13 @@ class DLFuzz:
     @staticmethod
     def before_softmax_model(model):
         if isinstance(model.layers[-1], Activation):
-            return Model(inputs=model.inputs, outputs=model.get_layer('before_softmax').output)
+            return Model(inputs=model.inputs, outputs=model.get_layer("before_softmax").output)
         else:
             # Get the configuration of the original last layer
             last_layer = model.layers[-1]
             last_layer_config = last_layer.get_config()
             last_layer_config["name"] += "_clone"
-            last_layer_config['activation'] = None  # Set activation to None
+            last_layer_config["activation"] = None  # Set activation to None
 
             # Create a new Dense layer with the modified configuration
             new_last_layer = Dense(**last_layer_config)
@@ -345,20 +426,35 @@ class DLFuzz:
             # model_label = Model(inputs=self.model.inputs, outputs=self.model.get_layer('before_softmax').output)
             # output1 = model_label(input_tensor)
             # loss_1 = tf.reduce_mean(output1[..., orig_label])
-            loss_1 = tf.reduce_mean(self.before_softmax_model(self.model)(input_tensor)[..., orig_label])
-            loss_2 = tf.reduce_mean(self.before_softmax_model(self.model)(input_tensor)[..., label_top5[-2]])
-            loss_3 = tf.reduce_mean(self.before_softmax_model(self.model)(input_tensor)[..., label_top5[-3]])
-            loss_4 = tf.reduce_mean(self.before_softmax_model(self.model)(input_tensor)[..., label_top5[-4]])
-            loss_5 = tf.reduce_mean(self.before_softmax_model(self.model)(input_tensor)[..., label_top5[-5]])
+            loss_1 = tf.reduce_mean(
+                self.before_softmax_model(self.model)(input_tensor)[..., orig_label]
+            )
+            loss_2 = tf.reduce_mean(
+                self.before_softmax_model(self.model)(input_tensor)[..., label_top5[-2]]
+            )
+            loss_3 = tf.reduce_mean(
+                self.before_softmax_model(self.model)(input_tensor)[..., label_top5[-3]]
+            )
+            loss_4 = tf.reduce_mean(
+                self.before_softmax_model(self.model)(input_tensor)[..., label_top5[-4]]
+            )
+            loss_5 = tf.reduce_mean(
+                self.before_softmax_model(self.model)(input_tensor)[..., label_top5[-5]]
+            )
 
-            layer_output = (self.predict_weight * (loss_2 + loss_3 + loss_4 + loss_5) - loss_1)
+            layer_output = self.predict_weight * (loss_2 + loss_3 + loss_4 + loss_5) - loss_1
             # layer_output = loss_1
 
             # neuron coverage loss
-            loss_neuron = DLFuzz.neuron_selection(self.model, input_tensor, self.model_layer_times1,
-                                                  self.model_layer_value1,
-                                                  self.neuron_select_strategy,
-                                                  self.neuron_to_cover_num, self.threshold)
+            loss_neuron = DLFuzz.neuron_selection(
+                self.model,
+                input_tensor,
+                self.model_layer_times1,
+                self.model_layer_value1,
+                self.neuron_select_strategy,
+                self.neuron_to_cover_num,
+                self.threshold,
+            )
 
             layer_output += self.neuron_to_cover_weight * tf.reduce_sum(loss_neuron)
 
@@ -381,7 +477,9 @@ class DLFuzz:
         # further process condition 1
         # previous accumulated neuron coverage
         previous_coverage = self.neuron_covered(self.model_layer_times1)[2]
-        self.update_coverage(gen_img, self.model, self.model_layer_times1, self.threshold)  # for seed selection
+        self.update_coverage(
+            gen_img, self.model, self.model_layer_times1, self.threshold
+        )  # for seed selection
         current_coverage = self.neuron_covered(self.model_layer_times1)[2]
 
         # further process condition 2
@@ -419,7 +517,9 @@ class DLFuzz:
                 pred1 = self.model.predict(gen_img)
                 label1 = np.argmax(pred1[0])
                 if label1 != orig_label:
-                    self.update_coverage(gen_img, self.model, self.model_layer_times2, self.threshold)
+                    self.update_coverage(
+                        gen_img, self.model, self.model_layer_times2, self.threshold
+                    )
 
         # end_time = time.clock()
 

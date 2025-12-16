@@ -1,7 +1,6 @@
-from tensorflow import keras
 import numpy as np
-
 from config import MODEL, num_classes
+from tensorflow import keras
 
 
 class Predictor:
@@ -39,7 +38,7 @@ class Predictor:
 
     @staticmethod
     def predict_single(img, label):
-        explabel = (np.expand_dims(label, 0))
+        explabel = np.expand_dims(label, 0)
 
         # Convert class vectors to binary class matrices
         explabel = keras.utils.to_categorical(explabel, num_classes)
@@ -61,4 +60,3 @@ class Predictor:
         confidence = confidence_expclass - confidence_notclass
 
         return prediction1, confidence
-

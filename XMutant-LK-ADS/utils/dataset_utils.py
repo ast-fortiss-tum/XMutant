@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from config import IMAGE_WIDTH, IMAGE_HEIGHT
+from config import IMAGE_HEIGHT, IMAGE_WIDTH
 
 
 def crop(image: np.ndarray) -> np.ndarray:
@@ -33,4 +33,3 @@ def preprocess(image: np.ndarray, if_yuv: bool = True) -> np.ndarray:
     if if_yuv:
         image = bgr2yuv(image=image)
     return image
-

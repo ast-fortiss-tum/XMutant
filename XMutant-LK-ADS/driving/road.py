@@ -1,26 +1,25 @@
 import copy
 import random
 from abc import ABC, abstractmethod
-from typing import List, Tuple, Dict, Generator, Iterator
+from typing import Dict, Iterator, List, Tuple
 
 import numpy as np
-from shapely.geometry import Point
-
 from config import NUM_SAMPLED_POINTS
 from custom_types import Tuple4F
 from driving.bbox import RoadBoundingBox
 from driving.catmull_rom import catmull_rom
 from driving.road_polygon import RoadPolygon
+from shapely.geometry import Point
 
 
 class Road(ABC):
 
     def __init__(
-            self,
-            road_width: int,
-            road_points: List[Point],
-            control_points: List[Point],
-            bbox_size=(0, 0, 250, 250),
+        self,
+        road_width: int,
+        road_points: List[Point],
+        control_points: List[Point],
+        bbox_size=(0, 0, 250, 250),
     ):
         self.road_width = road_width
         self.road_points = road_points
@@ -30,15 +29,15 @@ class Road(ABC):
 
     @abstractmethod
     def get_concrete_representation(self, to_plot: bool = False) -> List[Tuple4F]:
-        raise NotImplemented('Not implemented')
+        raise NotImplementedError("Not implemented")
 
     @abstractmethod
     def get_inverse_concrete_representation(self, to_plot: bool = False) -> List[Tuple4F]:
-        raise NotImplemented('Not implemented')
+        raise NotImplementedError("Not implemented")
 
     @abstractmethod
     def serialize_concrete_representation(self, cr: List[Tuple4F]) -> str:
-        raise NotImplemented('Not implemented')
+        raise NotImplementedError("Not implemented")
 
     @staticmethod
     def get_road_points_from_concrete(cr: List[Tuple4F]) -> List[Point]:
@@ -46,7 +45,7 @@ class Road(ABC):
 
     @staticmethod
     def get_road_width_from_concrete(cr: List[Tuple4F]) -> int:
-        assert len(cr) > 0, 'Concrete representation must not be empty'
+        assert len(cr) > 0, "Concrete representation must not be empty"
         return cr[0][-1]
 
     @staticmethod
@@ -72,7 +71,7 @@ class Road(ABC):
         return radius
 
     def compute_curvature(self, w: int = 5) -> float:
-        assert len(self.road_points) > 0, 'There must be road points to compute angles'
+        assert len(self.road_points) > 0, "There must be road points to compute angles"
         min_radius = np.inf
         nodes = self.road_points
         for i in range(len(nodes) - w):
@@ -83,18 +82,22 @@ class Road(ABC):
             if radius < min_radius:
                 min_radius = radius
 
-        curvature = (1 / min_radius)
+        curvature = 1 / min_radius
         return curvature
 
     # FIXME: a bit dirty, copied from deepjanus_test_generator
     def is_valid(self) -> bool:
         return RoadPolygon.from_nodes(
             self.get_concrete_representation(to_plot=True)
-        ).is_valid() and self.road_bbox.contains(RoadPolygon.from_nodes(
-            [(cp.x, cp.y, cp.z, self.road_width) for cp in self.control_points[1:-1]])
+        ).is_valid() and self.road_bbox.contains(
+            RoadPolygon.from_nodes(
+                [(cp.x, cp.y, cp.z, self.road_width) for cp in self.control_points[1:-1]]
+            )
         )
 
-    def mutate_gene(self, index: int, lower_bound: int, upper_bound: int, xy_prob: float = 0.5) -> Tuple[int, int]:
+    def mutate_gene(
+        self, index: int, lower_bound: int, upper_bound: int, xy_prob: float = 0.5
+    ) -> Tuple[int, int]:
         mutated_point = copy.deepcopy(self.control_points[index])
         # Choose the mutation extent
         mut_value = random.randint(a=lower_bound, b=upper_bound)
@@ -111,7 +114,8 @@ class Road(ABC):
 
         self.control_points[index] = mutated_point
         road_points = catmull_rom(
-            [(cp.x, cp.y, cp.z, self.road_width) for cp in self.control_points[1:]], num_spline_points=NUM_SAMPLED_POINTS
+            [(cp.x, cp.y, cp.z, self.road_width) for cp in self.control_points[1:]],
+            num_spline_points=NUM_SAMPLED_POINTS,
         )
         self.road_points = [Point(rp[0], rp[1]) for rp in road_points]
         return index_mutated, mut_value
@@ -124,7 +128,8 @@ class Road(ABC):
             mutated_point = Point(mutated_point.x, mutated_point.y - mut_value, mutated_point.z)
         self.control_points[index] = mutated_point
         road_points = catmull_rom(
-            [(cp.x, cp.y, cp.z, self.road_width) for cp in self.control_points[1:]], num_spline_points=NUM_SAMPLED_POINTS
+            [(cp.x, cp.y, cp.z, self.road_width) for cp in self.control_points[1:]],
+            num_spline_points=NUM_SAMPLED_POINTS,
         )
         self.road_points = [Point(rp[0], rp[1], rp[2]) for rp in road_points]
 
@@ -146,13 +151,13 @@ class Road(ABC):
     def import_keys() -> List[str]:
         return ["control_points", "road_points", "road_width"]
 
-    def __eq__(self, other: 'Road') -> bool:
+    def __eq__(self, other: "Road") -> bool:
         if isinstance(other, Road):
             return not self.are_control_points_different(other_control_points=other.control_points)
         raise RuntimeError("other {} is not an road".format(type(other)))
 
     def __hash__(self) -> int:
-        return hash('_'.join(['@'.join([cp.x, cp.y]) for cp in self.control_points]))
+        return hash("_".join(["@".join([cp.x, cp.y]) for cp in self.control_points]))
 
     @staticmethod
     def compute_angle_distance(v0: np.ndarray, v1: np.ndarray) -> float:
@@ -189,7 +194,9 @@ class Road(ABC):
     # - groups of points belonging to the same category
     # - groups smaller than 10 elements
     @staticmethod
-    def first_super_grouper(it: Iterator[List[str]], first_segment_threshold: int, second_segment_threshold: int) -> Iterator[List[str]]:
+    def first_super_grouper(
+        it: Iterator[List[str]], first_segment_threshold: int, second_segment_threshold: int
+    ) -> Iterator[List[str]]:
         prev = None
         group = []
         for item in it:
@@ -212,7 +219,9 @@ class Road(ABC):
     # - groups of points belonging to the same category
     # - groups smaller than 10 elements
     @staticmethod
-    def second_super_grouper(it: Iterator[List[str]], first_segment_threshold: int) -> Iterator[List[str]]:
+    def second_super_grouper(
+        it: Iterator[List[str]], first_segment_threshold: int
+    ) -> Iterator[List[str]]:
         prev = None
         group = []
         for item in it:
@@ -257,11 +266,10 @@ class Road(ABC):
         first_super_group = self.first_super_grouper(
             it=groups,
             first_segment_threshold=first_segment_threshold,
-            second_segment_threshold=second_segment_threshold
+            second_segment_threshold=second_segment_threshold,
         )
         second_super_group = self.second_super_grouper(
-            it=first_super_group,
-            first_segment_threshold=first_segment_threshold
+            it=first_super_group, first_segment_threshold=first_segment_threshold
         )
 
         num_turns = 0
@@ -282,6 +290,6 @@ class Road(ABC):
 
             if g[-1] != "s":
                 num_turns += 1
-                weighted_num_turns += 1/min_radius
+                weighted_num_turns += 1 / min_radius
 
         return num_turns, weighted_num_turns

@@ -7,14 +7,16 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import InputLayer, Dense
 from tensorflow.keras.activations import softmax
 
+
 def remove_last_softmax_activation(model):
-    if isinstance(model.layers[-1], Dense) and getattr(model.layers[-1], 'activation') == softmax:
+    if isinstance(model.layers[-1], Dense) and getattr(model.layers[-1], "activation") == softmax:
         # Modify the last layer to have a linear activation
         model_clone = tf.keras.models.clone_model(model)
         model_clone.set_weights(model.get_weights())
         model_clone.layers[-1].activation = tf.keras.activations.linear
         model = Model(inputs=model_clone.inputs, outputs=model_clone.layers[-1].output)
     return model
+
 
 def gradient_of_x(x, y, model, before_softmax=False):
     # Check if the last layer is a Dense layer with softmax activation
@@ -38,7 +40,7 @@ def gradient_of_x(x, y, model, before_softmax=False):
     return tape.gradient(loss, input_data)
 
 
-class FGSM():
+class FGSM:
 
     def __init__(self, model):
         self.model = model

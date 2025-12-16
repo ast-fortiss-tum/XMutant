@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
-import potrace
+
 import numpy as np
+import potrace
 
 
 def preprocess(npdata):
@@ -20,13 +21,33 @@ def createSVGpath(path):
         path_desc = path_desc + " M " + str(curve.start_point[0]) + "," + str(curve.start_point[1])
         for segment in curve:
             if segment.is_corner:
-                path_desc = path_desc + " L " + str(segment.c[0]) + "," + str(segment.c[1]) \
-                            + " L " + str(segment.end_point[0]) + "," + str(
-                    segment.end_point[1])
+                path_desc = (
+                    path_desc
+                    + " L "
+                    + str(segment.c[0])
+                    + ","
+                    + str(segment.c[1])
+                    + " L "
+                    + str(segment.end_point[0])
+                    + ","
+                    + str(segment.end_point[1])
+                )
             else:
-                path_desc = path_desc + " C " + str(segment.c1[0]) + "," + str(segment.c1[1]) + " " + str(
-                    segment.c2[0]) + "," + str(segment.c2[1]) + " " + str(segment.end_point[0]) + "," + str(
-                    segment.end_point[1])
+                path_desc = (
+                    path_desc
+                    + " C "
+                    + str(segment.c1[0])
+                    + ","
+                    + str(segment.c1[1])
+                    + " "
+                    + str(segment.c2[0])
+                    + ","
+                    + str(segment.c2[1])
+                    + " "
+                    + str(segment.end_point[0])
+                    + ","
+                    + str(segment.end_point[1])
+                )
     return path_desc + " Z"
 
 
@@ -40,7 +61,7 @@ def create_svg_xml(desc):
     path.set("d", desc)
     tree = ET.ElementTree(root)
     tree = tree.getroot()
-    xml_str = ET.tostring(tree, encoding='unicode', method='xml')
+    xml_str = ET.tostring(tree, encoding="unicode", method="xml")
     return xml_str
 
 
@@ -54,22 +75,24 @@ def vectorize(image):
     desc = createSVGpath(path)
     return create_svg_xml(desc)
 
+
 def getSVGpathControlPoints(path):
-    
+
     list_of_control_points = []
     # Iterate over path curves
     for curve in path:
         for segment in curve:
             if segment.is_corner:
-                list_of_control_points.append((segment.c[0],segment.c[1]))
-                list_of_control_points.append((segment.end_point[0],segment.end_point[1]))
+                list_of_control_points.append((segment.c[0], segment.c[1]))
+                list_of_control_points.append((segment.end_point[0], segment.end_point[1]))
 
             else:
-                list_of_control_points.append((segment.c1[0],segment.c1[1]))
-                list_of_control_points.append((segment.c2[0],segment.c2[1]))
-                list_of_control_points.append((segment.end_point[0],segment.end_point[1]))
+                list_of_control_points.append((segment.c1[0], segment.c1[1]))
+                list_of_control_points.append((segment.c2[0], segment.c2[1]))
+                list_of_control_points.append((segment.end_point[0], segment.end_point[1]))
 
     return list_of_control_points
+
 
 def getImageControlPoints(image):
     array = preprocess(image)

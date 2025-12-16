@@ -24,7 +24,7 @@ def load_image(img_path):
     input_img_data = image.img_to_array(img)
     input_img_data = input_img_data.reshape(1, 28, 28, 1)
 
-    input_img_data = input_img_data.astype('float32')
+    input_img_data = input_img_data.astype("float32")
     input_img_data /= 255
     # input_img_data = preprocess_input(input_img_data)  # final input shape = (1,224,224,3)
     return input_img_data
@@ -32,8 +32,8 @@ def load_image(img_path):
 
 def deprocess_image(x):
     x *= 255
-    x = np.clip(x, 0, 255).astype('uint8')
-    return x.reshape(28,28)  # original shape (1,img_rows, img_cols,1)
+    x = np.clip(x, 0, 255).astype("uint8")
+    return x.reshape(28, 28)  # original shape (1,img_rows, img_cols,1)
 
 
 def get_signature():

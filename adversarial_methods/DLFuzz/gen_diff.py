@@ -15,14 +15,14 @@ from utils import *
 
 
 def dlfuzz_load_model(model_name, input_tensor):
-    if model_name == 'model1':
+    if model_name == "model1":
         model = Model1(input_tensor=input_tensor)
     # elif model_name == 'model2':
     #    model = Model2(input_tensor=input_tensor)
     # elif model_name == 'model3':
     #    model = Model3(input_tensor=input_tensor)
     else:
-        print('please specify correct model name')
+        print("please specify correct model name")
         os._exit(0)
     print(model.name)
     return model
@@ -31,56 +31,46 @@ def dlfuzz_load_model(model_name, input_tensor):
 if __name__ == "__main__":
 
     # Initialize the parser
-    parser = argparse.ArgumentParser(description="Process some parameters for neuron selection strategy.")
+    parser = argparse.ArgumentParser(
+        description="Process some parameters for neuron selection strategy."
+    )
 
     # Add arguments with default values
     parser.add_argument(
-        'neuron_select_strategy',
+        "neuron_select_strategy",
         type=int,
         default=[2],
-        nargs='+',  # This will capture all following inputs as part of the list
-        help='The strategy to select neurons (default: [2])'
+        nargs="+",  # This will capture all following inputs as part of the list
+        help="The strategy to select neurons (default: [2])",
     )
     parser.add_argument(
-        '--threshold',
-        type=float,
-        default=0.5,
-        help='The threshold value (default: 0.5)'
+        "--threshold", type=float, default=0.5, help="The threshold value (default: 0.5)"
     )
     parser.add_argument(
-        '--neuron_to_cover_num',
+        "--neuron_to_cover_num",
         type=int,
         default=5,
-        help='The number of neurons to cover (default: 5)'
+        help="The number of neurons to cover (default: 5)",
     )
     parser.add_argument(
-        '--subdir',
-        type=str,
-        default='0602',
-        help='The subdirectory to work in (default: "0602")'
+        "--subdir", type=str, default="0602", help='The subdirectory to work in (default: "0602")'
     )
     parser.add_argument(
-        '--iteration_times',
-        type=int,
-        default=5,
-        help='The number of iteration times (default: 5)'
+        "--iteration_times", type=int, default=5, help="The number of iteration times (default: 5)"
     )
     parser.add_argument(
-        '--model_name',
-        type=str,
-        default='model1',
-        help='The name of the model (default: "model1")'
+        "--model_name", type=str, default="model1", help='The name of the model (default: "model1")'
     )
 
     # Parse the arguments
     # args = parser.parse_args()
 
     # Access the arguments
-    neuron_select_strategy = [2]#args.neuron_select_strategy
-    threshold = 0.5 #args.threshold
-    neuron_to_cover_num = 5 #args.neuron_to_cover_num
-    subdir = '0602'#args.subdir
-    iteration_times = 5#args.iteration_times
+    neuron_select_strategy = [2]  # args.neuron_select_strategy
+    threshold = 0.5  # args.threshold
+    neuron_to_cover_num = 5  # args.neuron_to_cover_num
+    subdir = "0602"  # args.subdir
+    iteration_times = 5  # args.iteration_times
     # model_name = args.model_name
 
     # neuron_select_strategy, threshold, neuron_to_cover_num, subdir, iteration_times, model_name = [2], 0.5, 5, "0602", 5, "model1"
@@ -95,18 +85,28 @@ if __name__ == "__main__":
 
     # define input tensor as a placeholder
     input_tensor = Input(shape=input_shape)
-    model = keras.models.load_model("cnnClassifier.h5") #dlfuzz_load_model(model_name, input_tensor)
+    model = keras.models.load_model(
+        "cnnClassifier.h5"
+    )  # dlfuzz_load_model(model_name, input_tensor)
 
-    img_dir = 'MNIST/seeds_50'
+    img_dir = "MNIST/seeds_50"
     img_paths = os.listdir(img_dir)
     img_num = len(img_paths)
 
-    save_dir = './generated_inputs_/' + subdir + '/'
+    save_dir = "./generated_inputs_/" + subdir + "/"
     clear_up_dir(save_dir)
 
     K.set_learning_phase(0)
-    dlfuzz = DLFuzz(model, neuron_select_strategy, threshold, neuron_to_cover_num, iteration_times,
-                    neuron_to_cover_weight, predict_weight, learning_step)
+    dlfuzz = DLFuzz(
+        model,
+        neuron_select_strategy,
+        threshold,
+        neuron_to_cover_num,
+        iteration_times,
+        neuron_to_cover_weight,
+        predict_weight,
+        learning_step,
+    )
 
     for i, img_path in tqdm(enumerate(img_paths), total=len(img_paths)):
         # load image
@@ -120,8 +120,8 @@ if __name__ == "__main__":
         # save image
         # mannual_label = int(img_name.split('_')[1])
         gen_img_deprocessed = deprocess_image(gen_img)
-        img_name = img_paths[i].split('.')[0]
-        save_img = save_dir + img_name + '_' + str(get_signature()) + '.png'
+        img_name = img_paths[i].split(".")[0]
+        save_img = save_dir + img_name + "_" + str(get_signature()) + ".png"
         Image.fromarray(gen_img_deprocessed).save(save_img)
 
 """

@@ -12,9 +12,10 @@ Description: Convolutional Variational AutoEncoder (VAE) trained on MNIST digits
 
 import numpy as np
 import tensorflow as tf
-#from tensorflow import keras
-from tensorflow.keras import layers
 import tensorflow.keras.backend as K
+
+# from tensorflow import keras
+from tensorflow.keras import layers
 
 """
 ## Create a belin of sampling layer
@@ -39,18 +40,18 @@ img_chn = 1
 ## Build the encoder
 """
 
-original_dim = img_dim*img_dim*img_chn
+original_dim = img_dim * img_dim * img_chn
 latent_dim = 200
 intermediate_dims = np.array([400])
 
-#encoder_inputs = keras.Input(shape=(img_dim, img_dim, img_chn))
-#flat_inputs = layers.Reshape((original_dim,))(encoder_inputs)
+# encoder_inputs = keras.Input(shape=(img_dim, img_dim, img_chn))
+# flat_inputs = layers.Reshape((original_dim,))(encoder_inputs)
 encoder_inputs = tf.keras.Input(shape=(original_dim,))
-#x = layers.Dense(intermediate_dims[0], activation="relu")(flat_inputs)
+# x = layers.Dense(intermediate_dims[0], activation="relu")(flat_inputs)
 x = layers.Dense(intermediate_dims[0], activation="relu")(encoder_inputs)
 x = layers.Dense(intermediate_dims[0], activation="relu")(x)
-z_mean = layers.Dense(latent_dim, name='z_mean')(x)
-z_log_var = layers.Dense(latent_dim, name='z_log_var')(x)
+z_mean = layers.Dense(latent_dim, name="z_mean")(x)
+z_log_var = layers.Dense(latent_dim, name="z_log_var")(x)
 z = Sampling()([z_mean, z_log_var])
 encoder = tf.keras.Model(encoder_inputs, [z_mean, z_log_var, z], name="encoder")
 encoder.summary()
@@ -61,17 +62,17 @@ encoder.summary()
 
 intermediate_dims = np.flipud(intermediate_dims)
 latent_inputs = tf.keras.Input(shape=(latent_dim,))
-x = layers.Dense(intermediate_dims[0], activation='relu')(latent_inputs)
-x = layers.Dense(intermediate_dims[0], activation='relu')(x)
-#pos_mean_flatten = layers.Dense(original_dim, name='pos_mean', activation="sigmoid")(x)
-#pos_mean = layers.Reshape([img_dim , img_dim , img_chn])(pos_mean_flatten)
-#pos_log_var_flatten = layers.Dense(original_dim, name='pos_log_var', activation="sigmoid")(x)
-#pos_log_var = layers.Reshape([img_dim , img_dim , img_chn])(pos_log_var_flatten)
+x = layers.Dense(intermediate_dims[0], activation="relu")(latent_inputs)
+x = layers.Dense(intermediate_dims[0], activation="relu")(x)
+# pos_mean_flatten = layers.Dense(original_dim, name='pos_mean', activation="sigmoid")(x)
+# pos_mean = layers.Reshape([img_dim , img_dim , img_chn])(pos_mean_flatten)
+# pos_log_var_flatten = layers.Dense(original_dim, name='pos_log_var', activation="sigmoid")(x)
+# pos_log_var = layers.Reshape([img_dim , img_dim , img_chn])(pos_log_var_flatten)
 
-#pos_mean = layers.Dense(original_dim, name='pos_mean', activation="sigmoid")(x)
-#pos_log_var = layers.Dense(original_dim, name='pos_log_var', activation="sigmoid")(x)
+# pos_mean = layers.Dense(original_dim, name='pos_mean', activation="sigmoid")(x)
+# pos_log_var = layers.Dense(original_dim, name='pos_log_var', activation="sigmoid")(x)
 
-pos_mean = layers.Dense(original_dim, name='pos_mean', activation='sigmoid')(x)
+pos_mean = layers.Dense(original_dim, name="pos_mean", activation="sigmoid")(x)
 
 decoder = tf.keras.Model(latent_inputs, pos_mean, name="decoder")
 decoder.summary()
@@ -88,9 +89,7 @@ class VAE(tf.keras.Model):
         self.encoder = encoder
         self.decoder = decoder
         self.total_loss_tracker = tf.keras.metrics.Mean(name="total_loss")
-        self.reconstruction_loss_tracker = tf.keras.metrics.Mean(
-            name="reconstruction_loss"
-        )
+        self.reconstruction_loss_tracker = tf.keras.metrics.Mean(name="reconstruction_loss")
         self.kl_loss_tracker = tf.keras.metrics.Mean(name="kl_loss")
 
     @property
@@ -109,8 +108,9 @@ class VAE(tf.keras.Model):
             reconstruction_loss = tf.reduce_mean(
                 tf.reduce_sum(
                     # TODO: mse is worse
-                    tf.keras.losses.binary_crossentropy(data, outputs), axis=(-1)
-                    #tf.keras.losses.mean_squared_error(data, outputs), axis=(-1)
+                    tf.keras.losses.binary_crossentropy(data, outputs),
+                    axis=(-1),
+                    # tf.keras.losses.mean_squared_error(data, outputs), axis=(-1)
                 )
             )
             kl_loss = -0.5 * (1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
@@ -134,16 +134,16 @@ class VAE(tf.keras.Model):
 """
 
 CLASS = None
-#CLASS = 5
+# CLASS = 5
 
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
 
-#mnist_digits = np.concatenate([x_train, x_test], axis=0)
+# mnist_digits = np.concatenate([x_train, x_test], axis=0)
 mnist_digits = x_train
 
 vae_name = "trained/mnist_vae_stocco"
 if CLASS is not None:
-    #mnist_labels = np.concatenate([y_train, y_test], axis=0)
+    # mnist_labels = np.concatenate([y_train, y_test], axis=0)
     mnist_labels = y_train
     idxs = np.argwhere(mnist_labels == CLASS)
     mnist_digits = mnist_digits[idxs]
@@ -155,13 +155,19 @@ else:
 
 mnist_digits = np.expand_dims(mnist_digits, -1).astype("float32") / 255
 
-mnist_digits = tf.reshape(tensor=mnist_digits, shape=(-1, original_dim,))
+mnist_digits = tf.reshape(
+    tensor=mnist_digits,
+    shape=(
+        -1,
+        original_dim,
+    ),
+)
 
 vae = VAE(encoder, decoder)
-#optimizer = tf.keras.optimizers.Adam(1e-4)
-#vae.compile(optimizer=optimizer)
+# optimizer = tf.keras.optimizers.Adam(1e-4)
+# vae.compile(optimizer=optimizer)
 vae.compile(optimizer="adam")
 vae.fit(mnist_digits, epochs=50, batch_size=BATCH_SIZE)
 
-vae.encoder.save(vae_name+"/encoder")
-vae.decoder.save(vae_name+"/decoder")
+vae.encoder.save(vae_name + "/encoder")
+vae.decoder.save(vae_name + "/decoder")

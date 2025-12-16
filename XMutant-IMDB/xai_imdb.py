@@ -1,13 +1,14 @@
-import tensorflow as tf
 import numpy as np
-
-from tf_keras_vis.utils.scores import BinaryScore
-from tf_keras_vis.saliency import Saliency
+import tensorflow as tf
 from alibi.explainers import IntegratedGradients
+from config import DEFAULT_WORD_ID, LENGTH_EXPLANATION, MAX_SEQUENCE_LENGTH
+
 # TODO
 from lime.lime_text import LimeTextExplainer
-from utils import pad_inputs, WORD_TO_ID, indices2words
-from config import MAX_SEQUENCE_LENGTH, LENGTH_EXPLANATION, DEFAULT_WORD_ID
+from tf_keras_vis.saliency import Saliency
+from tf_keras_vis.utils.scores import BinaryScore
+from utils import WORD_TO_ID, indices2words, pad_inputs
+
 
 def manual_saliency_map_embedding(model, input_tensor, target_class=0, magnitude=True):
     """
@@ -41,28 +42,29 @@ def manual_saliency_map_embedding(model, input_tensor, target_class=0, magnitude
     with tf.GradientTape() as tape:
         # Watch the embedding layer output
         tape.watch(embeddings)
-    
+
         # Pass embeddings through the rest of the model
         x = embeddings
         for layer in model.layers[1:]:
             x = layer(x)
         predictions = x
-    
+
         # Compute the score for the target class
         # Predict and get the loss for the target class
         if target_class is None:
             target_class = tf.argmax(predictions[0]).numpy()
         loss = predictions[:, target_class]
-    
+
     # Compute the gradients with respect to the embeddings
     grads = tape.gradient(loss, embeddings)
-    
+
     # Apply absolute value to the gradients
     if magnitude:
         grads = tf.abs(grads)
-    
+
     print("Saliency map calculated successfully.")
     return grads
+
 
 def back_propagate_embedding(gradients, method="sum"):
     """
@@ -90,6 +92,7 @@ def back_propagate_embedding(gradients, method="sum"):
     scalar_gradients = scalar_gradients.numpy()
     return scalar_gradients
 
+
 def top_k_attributions(input_indices, attributions, k=LENGTH_EXPLANATION):
     """
     rank_input_indices_by_gradient
@@ -110,7 +113,7 @@ def top_k_attributions(input_indices, attributions, k=LENGTH_EXPLANATION):
     if not isinstance(attributions, np.ndarray):
         attributions = np.array(attributions).squeeze()
 
-    #if magnitude:
+    # if magnitude:
     attributions_magnitude = np.abs(attributions)
     # Rank indices by gradient magnitude (descending order)
     ranked_indices = np.argsort(-attributions_magnitude)[0:k]
@@ -121,6 +124,7 @@ def top_k_attributions(input_indices, attributions, k=LENGTH_EXPLANATION):
     sorted_attributions = attributions[ranked_indices]
 
     return sorted_input_indices, sorted_attributions, ranked_indices
+
 
 """else:
     positive_attributions = np.clip(attributions, 0, None)
@@ -172,7 +176,7 @@ def xai_embedding(model, input_list, xai_method, target_class):
     # Create a new model that starts from the second layer onward
     submodel_input = tf.keras.Input(shape=embeddings.shape[1:])
     x = submodel_input
-    for layer in  model.layers[1:]:
+    for layer in model.layers[1:]:
         x = layer(x)
 
     submodel_output = x
@@ -190,7 +194,9 @@ def xai_embedding(model, input_list, xai_method, target_class):
         attributions = integrated_gradients(submodel, embeddings, target_class)
         saliency_map = back_propagate_embedding(attributions, method="sum")
     else:
-        raise ValueError("Unknown method: choose 'VanillaSaliency', 'SmoothGrad','IntegratedGradients'")
+        raise ValueError(
+            "Unknown method: choose 'VanillaSaliency', 'SmoothGrad','IntegratedGradients'"
+        )
     saliency_map = np.reshape(saliency_map, (-1, MAX_SEQUENCE_LENGTH))
     print(f"Saliency map {xai_method} calculated successfully.")
     return saliency_map
@@ -198,47 +204,44 @@ def xai_embedding(model, input_list, xai_method, target_class):
 
 def vanilla_saliency(model, X, target_class):
     # Create Saliency object.
-    saliency = Saliency(model,
-                        model_modifier=None,
-                        clone=True)
+    saliency = Saliency(model, model_modifier=None, clone=True)
 
     # Generate saliency map
-    saliency_map = saliency(BinaryScore(target_class), X,
-                            #gradient_modifier=None,
-                            normalize_map=False, # normalize to (1., 0.).
-                            keepdims=True)
+    saliency_map = saliency(
+        BinaryScore(target_class),
+        X,
+        # gradient_modifier=None,
+        normalize_map=False,  # normalize to (1., 0.).
+        keepdims=True,
+    )
     return saliency_map
 
 
 def smooth_grad(model, X, target_class):
     # Create Saliency object.
-    saliency = Saliency(model,
-                        model_modifier=None,
-                        clone=True)
+    saliency = Saliency(model, model_modifier=None, clone=True)
 
     # Generate saliency map with smoothing that reduce noise by adding noise
-    saliency_map = saliency(BinaryScore(target_class),
-                            X,
-                            smooth_samples=10,  # The number of calculating gradients iterations. 20
-                            smooth_noise=0.20, # noise spread level.
-                            #gradient_modifier=None,
-                            normalize_map=False, # normalize to (1., 0.).
-                            keepdims=True)
+    saliency_map = saliency(
+        BinaryScore(target_class),
+        X,
+        smooth_samples=10,  # The number of calculating gradients iterations. 20
+        smooth_noise=0.20,  # noise spread level.
+        # gradient_modifier=None,
+        normalize_map=False,  # normalize to (1., 0.).
+        keepdims=True,
+    )
     return saliency_map
 
 
-def integrated_gradients(model, X, target_class, steps=10): # 10
+def integrated_gradients(model, X, target_class, steps=10):  # 10
     if isinstance(X, tf.Tensor):
         X = X.numpy()
-    ig = IntegratedGradients(model,
-                            n_steps=steps,
-                            method="gausslegendre")
+    ig = IntegratedGradients(model, n_steps=steps, method="gausslegendre")
 
     # predictions = np.ones((X.shape[0])) * target_class
     # predictions = predictions.astype(int)
-    explanation = ig.explain(X,
-                            baselines=None,
-                            target=target_class)
+    explanation = ig.explain(X, baselines=None, target=target_class)
     attributions = np.array(explanation.attributions).squeeze()
 
     # print(attributions.shape)
@@ -246,7 +249,7 @@ def integrated_gradients(model, X, target_class, steps=10): # 10
     # positive_attributions = np.clip(attributions, 0, None)
     # negative_attributions = np.clip(attributions, None, 0)
 
-    return attributions # positive_attributions, negative_attributions
+    return attributions  # positive_attributions, negative_attributions
 
 
 def lime_explainer(prediction_function, text, length_explanation=LENGTH_EXPLANATION):
@@ -259,14 +262,13 @@ def lime_explainer(prediction_function, text, length_explanation=LENGTH_EXPLANAT
     Output:
     - explanation: a list of explanation [(words, attributions),...]
     """
-    explainer = LimeTextExplainer(class_names=['Negative', 'Positive'])
+    explainer = LimeTextExplainer(class_names=["Negative", "Positive"])
     # Generate explanation
-    exp = explainer.explain_instance(text,
-                                     prediction_function,
-                                     num_features=length_explanation)
+    exp = explainer.explain_instance(text, prediction_function, num_features=length_explanation)
     return exp.as_list()
     # Display the explanation
     # exp.show_in_notebook(text=True)
+
 
 def lime_batch_explainer(prediction_function, indices_list, length_explanation=LENGTH_EXPLANATION):
     """
@@ -278,17 +280,18 @@ def lime_batch_explainer(prediction_function, indices_list, length_explanation=L
     Output:
     - explanation: a list of explanation [(words, attributions),...]
     """
-    explainer = LimeTextExplainer(class_names=['Negative', 'Positive'])
+    explainer = LimeTextExplainer(class_names=["Negative", "Positive"])
 
     explanations = []
     # Generate explanation
     for indices in indices_list:
         text = indices2words(indices)
-        exp = explainer.explain_instance(text,
-                                         prediction_function,
-                                         num_features=length_explanation)
+        exp = explainer.explain_instance(text, prediction_function, num_features=length_explanation)
 
-        explanation = [(WORD_TO_ID.get(word, DEFAULT_WORD_ID["<unk>"]), attribution) for (word, attribution) in exp.as_list()]
+        explanation = [
+            (WORD_TO_ID.get(word, DEFAULT_WORD_ID["<unk>"]), attribution)
+            for (word, attribution) in exp.as_list()
+        ]
         explanations.append(explanation)
 
     return explanations
@@ -297,8 +300,8 @@ def lime_batch_explainer(prediction_function, indices_list, length_explanation=L
 if __name__ == "__main__":
     from population import load_imdb_test
     from predictor import Predictor
-    from utils import pad_inputs
-    X_test, y_test = load_imdb_test(pop_size = 10)
+
+    X_test, y_test = load_imdb_test(pop_size=10)
 
     print(X_test.shape, y_test.shape)
 
@@ -308,10 +311,9 @@ if __name__ == "__main__":
 
     # explanation = xai_embedding(predictor.model, X_test[0], "SmoothGrad", y_test[0])
     # print(explanation.shape)
-    #y_test = y_test
+    # y_test = y_test
     explanations = xai_embedding(predictor.model, X_test, "SmoothGrad", list(y_test))
     print(explanations.shape)
-
 
     text = indices2words(X_test[0])
     texts = [indices2words(X_test[0]), indices2words(X_test[1])]

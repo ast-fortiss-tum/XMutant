@@ -1,16 +1,18 @@
 # For Python 3.6 we use the base keras
-import tensorflow as tf
-from tensorflow import keras
 import numpy as np
+import tensorflow as tf
+from config import MAX_SEQUENCE_LENGTH, MODEL, NUM_DISTINCT_WORDS
+from utils import pad_inputs, words2indices
 
-from config import (MAX_SEQUENCE_LENGTH, NUM_DISTINCT_WORDS,MODEL)
-from utils import (words2indices, pad_inputs)
 
 class Predictor:
 
-    def __init__(self, model_dir=MODEL,
-                     max_sequence_length = MAX_SEQUENCE_LENGTH,
-                     num_distinct_words = NUM_DISTINCT_WORDS):
+    def __init__(
+        self,
+        model_dir=MODEL,
+        max_sequence_length=MAX_SEQUENCE_LENGTH,
+        num_distinct_words=NUM_DISTINCT_WORDS,
+    ):
         self.model = tf.keras.models.load_model(model_dir)
         print(f"Loaded model from disk {model_dir}")
         self.max_sequence_length = max_sequence_length
@@ -36,7 +38,7 @@ class Predictor:
         predictions_output = predictions_output.reshape(predictions_output.shape[0])
 
         predictions = (predictions_output >= 0.5).astype(int)
-        confidences = np.abs(1-predictions_output-predictions)
+        confidences = np.abs(1 - predictions_output - predictions)
 
         return predictions, confidences
 
@@ -65,7 +67,7 @@ class Predictor:
         predictions = self.model.predict(index_list)
         if predictions.shape[1] == 1:
             predictions = np.hstack([1 - predictions, predictions])
-            #print(predictions.shape)  # Ensure this prints (num_samples, 2)
+            # print(predictions.shape)  # Ensure this prints (num_samples, 2)
         return predictions
 
     def predict_tabular_xai(self, index_list):

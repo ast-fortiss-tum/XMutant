@@ -1,14 +1,10 @@
 import time
 
 import numpy as np
-import random
-import csv
-
-from config import DATASET, POPSIZE, STOP_CONDITION, NGEN, NUMBER, ATTENTION
+from config import ATTENTION, NGEN, NUMBER, POPSIZE, STOP_CONDITION
+from folder import Folder
 from population import Population
 from timer import Timer
-import time
-from folder import Folder
 from utils import set_all_seeds
 
 # import os
@@ -24,8 +20,8 @@ def main(num=NUMBER, popsize=POPSIZE, xai_method=ATTENTION, enable_timer: bool =
     print(f" Population size {pop.size}")
 
     # Collect data
-    field_names = ["id", "misclass ", "predicted label"]
-    data = []
+    # field_names = ["id", "misclass ", "predicted label"]
+    # data = []
 
     condition = True
     gen = 1
@@ -34,9 +30,18 @@ def main(num=NUMBER, popsize=POPSIZE, xai_method=ATTENTION, enable_timer: bool =
         pop.evaluate_population(gen, folder)
         confidences = [ind.confidence for ind in pop.population_to_mutate]
         if len(confidences) > 0:
-            print('Iteration:{:4}, Mis-number:{:3}, Pop-number:{:3}, avg:{:1.10f}, min:{:2.4f}, max:{:1.4f}'
-                  .format(*[gen, pop.misclass_number, len(confidences), np.mean(confidences),
-                            np.min(confidences), np.max(confidences)]))
+            print(
+                "Iteration:{:4}, Mis-number:{:3}, Pop-number:{:3}, avg:{:1.10f}, min:{:2.4f}, max:{:1.4f}".format(
+                    *[
+                        gen,
+                        pop.misclass_number,
+                        len(confidences),
+                        np.mean(confidences),
+                        np.min(confidences),
+                        np.max(confidences),
+                    ]
+                )
+            )
             pop.mutate()
             gen += 1
             if STOP_CONDITION == "iter":
@@ -66,7 +71,9 @@ def main(num=NUMBER, popsize=POPSIZE, xai_method=ATTENTION, enable_timer: bool =
         total_elapsed_time = time.time() - start_time
         print("Elapsed time:", total_elapsed_time)
         print(pop.elapsed_time)
-        print(f"percentage of heatmap time {pop.elapsed_time['heatmap_time'] / (total_elapsed_time)}")
+        print(
+            f"percentage of heatmap time {pop.elapsed_time['heatmap_time'] / (total_elapsed_time)}"
+        )
         return pop.elapsed_time, total_elapsed_time
 
 
@@ -79,7 +86,7 @@ if __name__ == "__main__":
         for digit in range(0, 2):# range(10):
             set_all_seeds(digit)
             main(num=digit, popsize=POPSIZE, xai_method=xai_method)"""
-    
+
     # random vit_model
     # for digit in range(10): # range(10):
     #     set_all_seeds(digit)

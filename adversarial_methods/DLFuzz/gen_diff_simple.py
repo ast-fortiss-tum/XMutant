@@ -14,15 +14,15 @@ from gen_diff import dlfuzz_load_model, clear_up_dir, load_image, deprocess_imag
 
 if __name__ == "__main__":
 
-    model =  keras.models.load_model("cnnClassifier.h5") #model1", Input(shape=(28, 28, 1)))
+    model = keras.models.load_model("cnnClassifier.h5")  # model1", Input(shape=(28, 28, 1)))
 
     # input images
-    img_dir = '../../oMNIST/seeds_50'
+    img_dir = "../../oMNIST/seeds_50"
     img_paths = os.listdir(img_dir)
     img_num = len(img_paths)
 
     # output images
-    save_dir = './MNIST/generated_inputs_/0510'
+    save_dir = "./MNIST/generated_inputs_/0510"
     clear_up_dir(save_dir)
 
     # prepare
@@ -42,6 +42,6 @@ if __name__ == "__main__":
         # save image
         # mannual_label = int(img_name.split('_')[1])
         gen_img_deprocessed = deprocess_image(gen_img)
-        img_name = img_paths[i].split('.')[0]
-        save_img = save_dir + img_name + '_' + str(get_signature()) + '.png'
+        img_name = img_paths[i].split(".")[0]
+        save_img = save_dir + img_name + "_" + str(get_signature()) + ".png"
         Image.fromarray(gen_img_deprocessed).save(save_img)

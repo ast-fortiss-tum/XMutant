@@ -1,8 +1,10 @@
-import utils
-import predictor
-import time
 import json
 import os
+import time
+
+import predictor
+import utils
+
 
 class Individual:
     def __init__(self, id, token_ids, label):
@@ -35,32 +37,34 @@ class Individual:
             # TODO: check
             self.predicted_label = predictor.predict_single_text(self.text)[0][0]
 
-        log_info = {'id': str(self.id),
-                'expected_label': str(self.expected_label),
-                'predicted_label': str(self.predicted_label),
-                'misbehaviour': str(self.misclassified),
-                'confidence': str(self.confidence),
-                'timestamp': str(self.timestamp),
-                'elapsed': str(time.time() - self.timestamp),
-                'token': ' '.join([str(x) for x in self.pure_indices]),
-                'text': utils.indices2words(self.pure_indices)
-                }
+        log_info = {
+            "id": str(self.id),
+            "expected_label": str(self.expected_label),
+            "predicted_label": str(self.predicted_label),
+            "misbehaviour": str(self.misclassified),
+            "confidence": str(self.confidence),
+            "timestamp": str(self.timestamp),
+            "elapsed": str(time.time() - self.timestamp),
+            "token": " ".join([str(x) for x in self.pure_indices]),
+            "text": utils.indices2words(self.pure_indices),
+        }
 
-        file_path = json_folder + '/' + str(self.id) + '.json'
+        file_path = json_folder + "/" + str(self.id) + ".json"
 
-        with open(file_path, 'w') as f:
+        with open(file_path, "w") as f:
             (json.dump(log_info, f, sort_keys=True, indent=4))
 
     def append_mutation_log(self, gen_number, folder):
-        dst = os.path.join(folder.individual_folder, 'ID'+str(self.id).zfill(4)+".csv")
+        dst = os.path.join(folder.individual_folder, "ID" + str(self.id).zfill(4) + ".csv")
 
-        data_to_append = {"id": self.id,
-                          "generation": gen_number,
-                          "expected_label": self.expected_label,
-                          "predicted_label": self.predicted_label,
-                          "misbehaviour": self.misclassified,
-                          "confidence": self.confidence,
-                          "text": utils.indices2words(self.pure_indices),
-                          }
+        data_to_append = {
+            "id": self.id,
+            "generation": gen_number,
+            "expected_label": self.expected_label,
+            "predicted_label": self.predicted_label,
+            "misbehaviour": self.misclassified,
+            "confidence": self.confidence,
+            "text": utils.indices2words(self.pure_indices),
+        }
 
         utils.csv_logger(dst, data_to_append)

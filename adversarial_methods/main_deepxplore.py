@@ -1,4 +1,5 @@
 from keras.layers import Input
+
 # from keras.utils import to_categorical
 from adversarial_methods.DeepXplore.utils import *
 import numpy as np
@@ -10,26 +11,28 @@ from config import POPSIZE
 import csv
 from PIL import Image
 
-def init_coverage_tables_single(model1):# (model1, model2, model3):
+
+def init_coverage_tables_single(model1):  # (model1, model2, model3):
     model_layer_dict1 = defaultdict(bool)
     # model_layer_dict2 = defaultdict(bool)
     # model_layer_dict3 = defaultdict(bool)
     init_dict(model1, model_layer_dict1)
     # init_dict(model2, model_layer_dict2)
     # init_dict(model3, model_layer_dict3)
-    return model_layer_dict1# , model_layer_dict2, model_layer_dict3
+    return model_layer_dict1  # , model_layer_dict2, model_layer_dict3
+
 
 # Parameters (replace these with your desired values or use argparse as needed)
 
-transformation = 'occl'  # Options: 'light', 'occl', 'blackout'
-start_point=(0, 0)
-rect_shape=(10, 10)
+transformation = "occl"  # Options: 'light', 'occl', 'blackout'
+start_point = (0, 0)
+rect_shape = (10, 10)
 
 weight_diff = 1
 weight_nc = 0.1
 weight_vae = 0
 step = 0.1
-#seeds = 50
+# seeds = 50
 grad_iterations = 150
 threshold = 0.0
 target_model = 0
@@ -47,7 +50,7 @@ for digit in range(10):  # range(10):
     set_all_seeds(digit)
     x_test, y_test = load_mnist_test(pop_size, digit)
 
-    x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1).astype('float32') / 255.0
+    x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1).astype("float32") / 255.0
 
     # Model setup
     input_tensor = Input(shape=input_shape)
@@ -55,7 +58,7 @@ for digit in range(10):  # range(10):
     model_layer_dict = init_coverage_tables_single(model)
 
     # Perturbation loop
-    for seed_idx, (current_seed,orig_label) in enumerate(zip(x_test,y_test)):
+    for seed_idx, (current_seed, orig_label) in enumerate(zip(x_test, y_test)):
         print(f"Processing seed {seed_idx + 1}/{len(x_test)}")
         gen_img = np.expand_dims(current_seed, axis=0)
         _label = np.argmax(model.predict(gen_img)[0])
@@ -67,9 +70,11 @@ for digit in range(10):  # range(10):
         # Construct loss function
         # ValueError: No such layer: before_softmax. Existing layers are: ['conv2d', 'conv2d_1', 'max_pooling2d', 'dropout', 'flatten', 'dense', 'dropout_1', 'dense_1'].
 
-        gen_img_tensor = tf.convert_to_tensor(gen_img, dtype=tf.float32)  # Convert initial input to tensor
+        gen_img_tensor = tf.convert_to_tensor(
+            gen_img, dtype=tf.float32
+        )  # Convert initial input to tensor
         y = np.zeros((1, 10))
-        y[0,orig_label] = 1
+        y[0, orig_label] = 1
         true_labels = tf.convert_to_tensor(y, dtype=tf.float32)
         intermediate_model = Model(inputs=model.input, outputs=model.get_layer(layer_name1).output)
 
@@ -90,7 +95,9 @@ for digit in range(10):  # range(10):
 
             # Loss 2: Neuron activation-based loss
 
-            loss1_neuron = weight_nc * tf.reduce_mean(intermediate_output[..., index1])  # Intermediate layer loss
+            loss1_neuron = weight_nc * tf.reduce_mean(
+                intermediate_output[..., index1]
+            )  # Intermediate layer loss
 
             # Final loss
             final_loss = loss1 + loss1_neuron  # Use the computed final_loss
@@ -108,11 +115,11 @@ for digit in range(10):  # range(10):
             # loss_value1, loss_neuron, grads_value = iterate([gen_img])
 
             # Apply constraints (transformation-specific)
-            if transformation == 'light':
+            if transformation == "light":
                 grads_value = constraint_light(grads)
-            elif transformation == 'occl':
+            elif transformation == "occl":
                 grads_value = constraint_occl(grads, start_point=start_point, rect_shape=rect_shape)
-            elif transformation == 'blackout':
+            elif transformation == "blackout":
                 grads_value = constraint_black(grads)
 
             # Update the generated image
@@ -130,33 +137,43 @@ for digit in range(10):  # range(10):
                 Image.fromarray(gen_img_deprocessed).save(save_img)
                 # record csv
                 if os.path.exists(csv_file):
-                    with open(csv_file, 'a', newline='') as f:
+                    with open(csv_file, "a", newline="") as f:
                         csv_writer = csv.writer(f)
-                        csv_writer.writerow([digit,
-                                             seed_idx,
-                                             orig_label,
-                                             new_prediction,
-                                             confidence,
-                                             iteration,
-                                             save_img])
+                        csv_writer.writerow(
+                            [
+                                digit,
+                                seed_idx,
+                                orig_label,
+                                new_prediction,
+                                confidence,
+                                iteration,
+                                save_img,
+                            ]
+                        )
                 else:
-                    with open(csv_file, 'w', newline='') as f:
+                    with open(csv_file, "w", newline="") as f:
                         csv_writer = csv.writer(f)
-                        csv_writer.writerow([
-                            'digit',
-                            'id',
-                            'expected_label',
-                            'predicted_label',
-                            'confidence',
-                            'iteration',
-                            'image_path'
-                        ])
-                        csv_writer.writerow([digit,
-                                             seed_idx,
-                                             orig_label,
-                                             new_prediction,
-                                             confidence,
-                                             iteration,
-                                             save_img])
+                        csv_writer.writerow(
+                            [
+                                "digit",
+                                "id",
+                                "expected_label",
+                                "predicted_label",
+                                "confidence",
+                                "iteration",
+                                "image_path",
+                            ]
+                        )
+                        csv_writer.writerow(
+                            [
+                                digit,
+                                seed_idx,
+                                orig_label,
+                                new_prediction,
+                                confidence,
+                                iteration,
+                                save_img,
+                            ]
+                        )
 
                 break

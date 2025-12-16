@@ -1,16 +1,17 @@
 import datetime
-from os.path import exists, join
 from os import makedirs
-from config import MUTATION_RECORD, XAI_METHOD #, NUMBER
+from os.path import exists
+
+from config import MUTATION_RECORD, XAI_METHOD  # , NUMBER
 
 
 class Folder:
-    def __init__(self, xai_method = XAI_METHOD):
+    def __init__(self, xai_method=XAI_METHOD):
         current = datetime.datetime.now()
-        file_name = 'log' + current.strftime("%m-%d_%H-%M")
+        file_name = "log" + current.strftime("%m-%d_%H-%M")
         file_name = file_name + "_" + xai_method
 
-        #run_id = str(Timer.start.strftime('%s'))
+        # run_id = str(Timer.start.strftime('%s'))
         self.DST = "runs/" + file_name
         if not exists(self.DST):
             makedirs(self.DST)
